@@ -72,13 +72,13 @@ This project demonstrates my understanding of:
 az login
 
 # Set subscription (optional – if you have multiple)
-az account set --subscription "Your-Subscription-Name"
+az account set --subscription "portfolio projects"
 
 # Create Resource Group with tags
 az group create \
   --name rg-az104-project01 \
   --location eastus \
-  --tags Environment=Lab CostCenter=IT-Services Owner=YourName
+  --tags Environment=Lab CostCenter=IT-Services Owner=Harold Nduna
 
 # Verify the Resource Group was created
 az group show --name rg-az104-project01
