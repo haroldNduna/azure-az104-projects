@@ -51,7 +51,6 @@ This project demonstrates my understanding of:
 
 ##  Architecture Diagram
 
-![Architecture Diagram](./architecture-diagram.drawio)
 
 *Simple architecture showing Resource Group as a logical container with tags applied.*
 
