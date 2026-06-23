@@ -1,0 +1,71 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "resourceGroupName": {
+      "type": "string",
+      "defaultValue": "rg-az104-project01",
+      "metadata": {
+        "description": "Name of the Resource Group"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "description": "Azure region for the Resource Group"
+      }
+    },
+    "environment": {
+      "type": "string",
+      "defaultValue": "Lab",
+      "metadata": {
+        "description": "Environment classification (Security+ Asset Classification)"
+      }
+    },
+    "costCenter": {
+      "type": "string",
+      "defaultValue": "IT-Services",
+      "metadata": {
+        "description": "Cost center for financial accountability"
+      }
+    },
+    "owner": {
+      "type": "string",
+      "defaultValue": "Harold Nduna",
+      "metadata": {
+        "description": "Resource owner for accountability"
+      }
+    }
+  },
+  "variables": {
+    "tags": {
+      "Environment": "[parameters('environment')]",
+      "CostCenter": "[parameters('costCenter')]",
+      "Owner": "[parameters('owner')]"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2024-03-01",
+      "name": "[parameters('resourceGroupName')]",
+      "location": "[parameters('location')]",
+      "tags": "[variables('tags')]"
+    }
+  ],
+  "outputs": {
+    "resourceGroupName": {
+      "type": "string",
+      "value": "[parameters('resourceGroupName')]"
+    },
+    "resourceGroupLocation": {
+      "type": "string",
+      "value": "[parameters('location')]"
+    },
+    "resourceGroupTags": {
+      "type": "object",
+      "value": "[variables('tags')]"
+    }
+  }
+}

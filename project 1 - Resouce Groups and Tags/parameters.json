@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "resourceGroupName": {
+      "value": "rg-az104-project01"
+    },
+    "location": {
+      "value": "eastus"
+    },
+    "environment": {
+      "value": "Lab"
+    },
+    "costCenter": {
+      "value": "IT-Services"
+    },
+    "owner": {
+      "value": "Harold Nduna"
+    }
+  }
+}

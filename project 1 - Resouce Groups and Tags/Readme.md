@@ -24,7 +24,7 @@ This project demonstrates the foundational Azure skill of creating and managing 
 
 ---
 
-##  Security+ Alignment (For Recruiters)
+##  Security+ Alignment
 
 This project demonstrates my understanding of:
 
@@ -41,10 +41,10 @@ This project demonstrates my understanding of:
 | Tool | Purpose |
 |------|---------|
 | **Azure Portal** | Visual verification and management |
-| **Azure CLI** | Command-line deployment (primary – exam-relevant) |
-| **Azure PowerShell** | Alternative deployment (reference) |
-| **Bicep** | Infrastructure as Code (primary – Microsoft-recommended) |
-| **ARM Templates (JSON)** | Infrastructure as Code (reference) |
+| **Azure CLI** | Command-line deployment |
+| **Azure PowerShell** | Alternative deployment |
+| **Bicep** | Infrastructure as Code |
+| **ARM Templates (JSON)** | Infrastructure as Code |
 | **Git** | Version control and portfolio management |
 
 ---
@@ -62,9 +62,9 @@ This project demonstrates my understanding of:
 ### Prerequisites
 
 - Azure subscription
-- Azure CLI
+- Azure CLI installed or access to Azure Cloud Shell
 - Git installed locally
-- GitHub account
+- GitHub account (for portfolio)
 
 ### Method 1: Azure CLI (Bash) – Primary
 
@@ -72,14 +72,14 @@ This project demonstrates my understanding of:
 # Login to Azure
 az login
 
-# Set subscription
+# Set subscription (optional – if you have multiple)
 az account set --subscription "Your-Subscription-Name"
 
 # Create Resource Group with tags
 az group create \
   --name rg-az104-project01 \
   --location eastus \
-  --tags Environment = Lab CostCenter = IT-Services Owner = Harold Nduna
+  --tags Environment=Lab CostCenter=IT-Services Owner=YourName
 
 # Verify the Resource Group was created
 az group show --name rg-az104-project01
