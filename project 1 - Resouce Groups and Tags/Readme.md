@@ -4,12 +4,6 @@
 
 This project demonstrates the foundational Azure skill of creating and managing **Resource Groups** with **tags** to support governance, cost management, and accountability. As a security-conscious cloud professional, I've aligned this project with **CompTIA Security+ (SY0-701)** domains:
 
-| Security+ Domain | How This Project Addresses It |
-|------------------|-------------------------------|
-| **Domain 5.0 – Governance & Compliance** | Tags enable cost tracking, asset classification, and audit readiness |
-| **Domain 3.0 – Access Control (Least Privilege)** | Resource Groups act as logical security boundaries for RBAC |
-| **Domain 6.0 – Monitoring & Incident Response** | Tagging supports resource identification during incident investigation |
-
 ---
 
 ##  Project Objectives
