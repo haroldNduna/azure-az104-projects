@@ -1,0 +1,97 @@
+<mxfile host="app.diagrams.net" agent="AZ104-Project03">
+  <diagram id="project03-vnet" name="Project 03 - VNet with Subnets">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1120" pageHeight="760" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="&lt;b&gt;Project 03 – Azure Virtual Network with Subnets&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:12px&quot;&gt;Three-tier segmentation · private subnets · service endpoint to Storage&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontColor=#1F2937;" vertex="1" parent="1">
+          <mxGeometry x="160" y="10" width="800" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Subscription -->
+        <mxCell id="sub" value="Azure Subscription (Free Trial)" style="rounded=1;arcSize=2;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#6B7280;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontStyle=1;fontColor=#374151;" vertex="1" parent="1">
+          <mxGeometry x="20" y="70" width="1080" height="670" as="geometry" />
+        </mxCell>
+
+        <!-- Region -->
+        <mxCell id="region" value="Region: East US" style="rounded=1;arcSize=2;whiteSpace=wrap;html=1;dashed=1;dashPattern=8 4;fillColor=none;strokeColor=#2563EB;verticalAlign=top;align=left;spacingLeft=12;spacingTop=6;fontColor=#1D4ED8;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="105" width="1040" height="620" as="geometry" />
+        </mxCell>
+
+        <!-- Resource group -->
+        <mxCell id="rg" value="Resource Group: rg-az104-project03" style="rounded=1;arcSize=2;whiteSpace=wrap;html=1;fillColor=#F3F4F6;strokeColor=#9CA3AF;verticalAlign=top;align=left;spacingLeft=44;spacingTop=8;fontStyle=1;fontColor=#111827;" vertex="1" parent="1">
+          <mxGeometry x="60" y="140" width="740" height="570" as="geometry" />
+        </mxCell>
+        <mxCell id="rgicon" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/general/Resource_Groups.svg;" vertex="1" parent="1">
+          <mxGeometry x="70" y="146" width="26" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="tags" value="Tags: Environment=Lab · CostCenter=IT-Services · Owner=Harold Nduna · Project=AZ104-Project03" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#4B5563;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="104" y="170" width="680" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- VNet -->
+        <mxCell id="vnet" value="Virtual Network: vnet-az104-project03 &amp;nbsp;|&amp;nbsp; Address space 10.10.0.0/16" style="rounded=1;arcSize=2;whiteSpace=wrap;html=1;fillColor=#ECFDF5;strokeColor=#059669;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=44;spacingTop=8;fontStyle=1;fontColor=#065F46;" vertex="1" parent="1">
+          <mxGeometry x="80" y="200" width="700" height="490" as="geometry" />
+        </mxCell>
+        <mxCell id="vneticon" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/networking/Virtual_Networks.svg;" vertex="1" parent="1">
+          <mxGeometry x="90" y="205" width="30" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Subnets -->
+        <mxCell id="snetweb" value="&lt;b&gt;snet-web&lt;/b&gt; · 10.10.1.0/24 · 251 usable IPs&lt;br&gt;Web tier · Private subnet (no default outbound access)&lt;br&gt;&lt;i&gt;Future: NSG (P04), VMs (P05), Load Balancer backend (P06)&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#2563EB;align=left;spacingLeft=52;fontSize=12;fontColor=#1E3A8A;" vertex="1" parent="1">
+          <mxGeometry x="105" y="245" width="650" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="snetwebicon" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/networking/Subnet.svg;" vertex="1" parent="1">
+          <mxGeometry x="118" y="276" width="34" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="snetapp" value="&lt;b&gt;snet-app&lt;/b&gt; · 10.10.2.0/24 · 251 usable IPs&lt;br&gt;Application tier · Private subnet (no default outbound access)&lt;br&gt;&lt;i&gt;No direct internet exposure&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;align=left;spacingLeft=52;fontSize=12;fontColor=#78350F;" vertex="1" parent="1">
+          <mxGeometry x="105" y="350" width="650" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="snetappicon" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/networking/Subnet.svg;" vertex="1" parent="1">
+          <mxGeometry x="118" y="381" width="34" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="snetdata" value="&lt;b&gt;snet-data&lt;/b&gt; · 10.10.3.0/24 · 251 usable IPs&lt;br&gt;Data tier · Private subnet (no default outbound access)&lt;br&gt;&lt;i&gt;Service endpoint: Microsoft.Storage&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;align=left;spacingLeft=52;fontSize=12;fontColor=#831843;" vertex="1" parent="1">
+          <mxGeometry x="105" y="455" width="650" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="snetdataicon" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/networking/Subnet.svg;" vertex="1" parent="1">
+          <mxGeometry x="118" y="486" width="34" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="snetbastion" value="&lt;b&gt;AzureBastionSubnet&lt;/b&gt; · 10.10.254.0/26 · 59 usable IPs&lt;br&gt;Management · Reserved for Azure Bastion (exact name, min /26)&lt;br&gt;&lt;i&gt;Admin access without public IPs or open RDP/SSH&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E5E7EB;strokeColor=#4B5563;dashed=1;align=left;spacingLeft=52;fontSize=12;fontColor=#1F2937;" vertex="1" parent="1">
+          <mxGeometry x="105" y="575" width="650" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="snetbastionicon" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/networking/Subnet.svg;" vertex="1" parent="1">
+          <mxGeometry x="118" y="606" width="34" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Internet -->
+        <mxCell id="internet" value="Internet" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#6B7280;fontStyle=1;fontColor=#374151;" vertex="1" parent="1">
+          <mxGeometry x="850" y="140" width="190" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-internet" value="✖ No implicit outbound&lt;br&gt;(explicit egress only)" style="endArrow=block;html=1;dashed=1;strokeColor=#DC2626;strokeWidth=2;fontColor=#DC2626;fontSize=11;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.16;entryY=0.75;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="snetweb" target="internet">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Storage account from Project 02 -->
+        <mxCell id="storage" value="&lt;b&gt;staz104proj02&lt;/b&gt;&lt;br&gt;Storage Account&lt;br&gt;(Project 02, rg-az104-project02)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0078D4;strokeWidth=2;verticalAlign=bottom;spacingBottom=8;fontSize=12;fontColor=#0F172A;" vertex="1" parent="1">
+          <mxGeometry x="840" y="430" width="210" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="storageicon" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/storage/Storage_Accounts.svg;" vertex="1" parent="1">
+          <mxGeometry x="925" y="440" width="40" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-storage" value="Service endpoint&lt;br&gt;(Azure backbone)" style="endArrow=block;html=1;strokeColor=#0078D4;strokeWidth=2;fontColor=#0078D4;fontSize=11;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="snetdata" target="storage">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Security+ legend -->
+        <mxCell id="legend" value="&lt;b&gt;Security+ controls&lt;/b&gt;&lt;br&gt;• Network segmentation (3 tiers)&lt;br&gt;• Secure by default (private subnets)&lt;br&gt;• Least privilege egress&lt;br&gt;• Attack surface reduction (Bastion)&lt;br&gt;• Asset tagging &amp;amp; accountability" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFBEB;strokeColor=#F59E0B;align=left;verticalAlign=top;spacingLeft=10;spacingTop=6;fontSize=11;fontColor=#78350F;" vertex="1" parent="1">
+          <mxGeometry x="830" y="580" width="230" height="120" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

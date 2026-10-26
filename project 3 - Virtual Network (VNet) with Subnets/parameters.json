@@ -1,0 +1,23 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "eastus"
+    },
+    "vnetName": {
+      "value": "vnet-az104-project03"
+    },
+    "vnetAddressPrefix": {
+      "value": "10.10.0.0/16"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Lab",
+        "CostCenter": "IT-Services",
+        "Owner": "Harold Nduna",
+        "Project": "AZ104-Project03"
+      }
+    }
+  }
+}

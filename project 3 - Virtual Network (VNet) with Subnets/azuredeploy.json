@@ -1,0 +1,121 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.48.1.52935",
+      "templateHash": "17529393639219827624"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Azure region for all resources. Defaults to the resource group location."
+      }
+    },
+    "vnetName": {
+      "type": "string",
+      "defaultValue": "vnet-az104-project03",
+      "metadata": {
+        "description": "Name of the virtual network."
+      }
+    },
+    "vnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.10.0.0/16",
+      "metadata": {
+        "description": "VNet address space. Must not overlap with any network you plan to peer with."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {
+        "Environment": "Lab",
+        "CostCenter": "IT-Services",
+        "Owner": "Harold Nduna",
+        "Project": "AZ104-Project03"
+      },
+      "metadata": {
+        "description": "Tags applied to every resource (asset classification and accountability)."
+      }
+    }
+  },
+  "variables": {
+    "subnets": [
+      {
+        "name": "snet-web",
+        "prefix": "10.10.1.0/24",
+        "serviceEndpoints": [],
+        "private": true
+      },
+      {
+        "name": "snet-app",
+        "prefix": "10.10.2.0/24",
+        "serviceEndpoints": [],
+        "private": true
+      },
+      {
+        "name": "snet-data",
+        "prefix": "10.10.3.0/24",
+        "serviceEndpoints": [
+          {
+            "service": "Microsoft.Storage"
+          }
+        ],
+        "private": true
+      },
+      {
+        "name": "AzureBastionSubnet",
+        "prefix": "10.10.254.0/26",
+        "serviceEndpoints": [],
+        "private": false
+      }
+    ]
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2024-05-01",
+      "name": "[parameters('vnetName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "copy": [
+          {
+            "name": "subnets",
+            "count": "[length(variables('subnets'))]",
+            "input": {
+              "name": "[variables('subnets')[copyIndex('subnets')].name]",
+              "properties": {
+                "addressPrefix": "[variables('subnets')[copyIndex('subnets')].prefix]",
+                "serviceEndpoints": "[variables('subnets')[copyIndex('subnets')].serviceEndpoints]",
+                "defaultOutboundAccess": "[if(variables('subnets')[copyIndex('subnets')].private, false(), null())]"
+              }
+            }
+          }
+        ],
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vnetAddressPrefix')]"
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "vnetId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+    },
+    "subnetNames": {
+      "type": "array",
+      "copy": {
+        "count": "[length(variables('subnets'))]",
+        "input": "[variables('subnets')[copyIndex()].name]"
+      }
+    }
+  }
+}
