@@ -282,12 +282,8 @@ az group exists --name rg-az104-project04   # wait for 'false'
 | 3 | `03-nsg-web-inbound.png` | `nsg-web` → Settings → Inbound security rules | Custom rules **and** the default 65000+ rules underneath |
 | 4 | `04-nsg-data-outbound.png` | `nsg-data` → Settings → Outbound security rules | Allow-Storage-Out (100), Deny-Internet-Out (4000), then the defaults |
 | 5 | `05-subnet-associations.png` | `vnet-az104-project04` → Settings → Subnets | The **Security group** column showing each NSG |
-| 6 | `06-test-results.png` | Terminal at the end of `./test-nsg.sh` | Both result tables with PASS |
-| 7 | `07-effective-security-rules.png` | `vm-data` → Networking → Network settings → Effective security rules (or NIC → Help → Effective security rules) | The merged rule list applied to the VM |
-| 8 | `08-ip-flow-verify-deny.png` | Network Watcher → IP flow verify (web → data 1433) | **Access denied** and the rule **Deny-VNet-Inbound** |
-| 9 | `09-ip-flow-verify-allow.png` | Network Watcher → IP flow verify (app → data 1433) | **Access allowed** and the rule **Allow-SQL-From-App** |
-| 10 | `10-activity-log.png` | `rg-az104-project04` → Activity log | "Create or Update Security Rule" events with your name as the initiator |
-| 11 | `11-cleanup.png` | Terminal after `./cleanup.sh` and `az group exists` | Confirmation prompt and the final `false` |
+| 6 | `10-activity-log.png` | `rg-az104-project04` → Activity log | "Create or Update Security Rule" events with your name as the initiator |
+| 7 | `11-cleanup.png` | Terminal after `./cleanup.sh` and `az group exists` | Confirmation prompt and the final `false` |
 
 Blur your subscription ID, tenant ID and email address before committing screenshots.
 
