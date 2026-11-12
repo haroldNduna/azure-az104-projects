@@ -1,0 +1,503 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.48.1.52935",
+      "templateHash": "2238665458940681072"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Azure region. East US 2 was used because B-series capacity was unavailable in East US."
+      }
+    },
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Standard_D2s_v3",
+      "metadata": {
+        "description": "VM size for all three VMs."
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "defaultValue": "azureuser",
+      "metadata": {
+        "description": "Admin username for the Linux VMs."
+      }
+    },
+    "adminPublicKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "SSH public key (contents of ~/.ssh/id_rsa.pub). Password login is disabled."
+      }
+    },
+    "shutdownTime": {
+      "type": "string",
+      "defaultValue": "1900",
+      "metadata": {
+        "description": "Daily auto-shutdown time (24h, local to timeZoneId)."
+      }
+    },
+    "timeZoneId": {
+      "type": "string",
+      "defaultValue": "Central European Standard Time",
+      "metadata": {
+        "description": "Time zone for auto-shutdown."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {
+        "Environment": "Lab",
+        "CostCenter": "IT-Services",
+        "Owner": "Harold Nduna",
+        "Project": "AZ104-Project05"
+      },
+      "metadata": {
+        "description": "Tags applied to every resource."
+      }
+    }
+  },
+  "variables": {
+    "$fxv#0": "I2Nsb3VkLWNvbmZpZwojID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiMgUHJvamVjdCAwNSAtIGNsb3VkLWluaXQgZm9yIHZtLWFwcAojIFBhc3RlZCBpbnRvIHRoZSAiQ3VzdG9tIGRhdGEiIGJveCB3aGVuIGNyZWF0aW5nIHZtLWFwcCAoQWR2YW5jZWQgdGFiKS4KIyBSdW5zIE9OQ0UsIGF0IGZpcnN0IGJvb3QgKHRoZSAibW92ZS1pbiBkYXkgY2hlY2tsaXN0IikuCiMKIyBTdGFydHMgYSB0aW55IHdlYiBzZXJ2ZXIgb24gVENQIDgwODAgYXMgYSBzdGFuZC1pbiBmb3IgYW4gYXBwbGljYXRpb24uCiMgVXNlcyBQeXRob24sIHdoaWNoIGlzIGFscmVhZHkgaW4gdGhlIFVidW50dSBpbWFnZSwgc28gbm8gaW50ZXJuZXQgaXMgbmVlZGVkCiMgKHRoZSBhcHAgc3VibmV0IGlzIHByaXZhdGUgYW5kIGhhcyBubyBOQVQgR2F0ZXdheSkuCiMgPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KcGFja2FnZV91cGRhdGU6IGZhbHNlCnBhY2thZ2VfdXBncmFkZTogZmFsc2UKd3JpdGVfZmlsZXM6CiAgLSBwYXRoOiAvZXRjL3N5c3RlbWQvc3lzdGVtL2FwcC1saXN0ZW5lci5zZXJ2aWNlCiAgICBjb250ZW50OiB8CiAgICAgIFtVbml0XQogICAgICBEZXNjcmlwdGlvbj1BWi0xMDQgUHJvamVjdCAwNSB0ZXN0IGFwcGxpY2F0aW9uIG9uIFRDUCA4MDgwCiAgICAgIEFmdGVyPW5ldHdvcmstb25saW5lLnRhcmdldAogICAgICBbU2VydmljZV0KICAgICAgRXhlY1N0YXJ0PS91c3IvYmluL3B5dGhvbjMgLW0gaHR0cC5zZXJ2ZXIgODA4MCAtLWRpcmVjdG9yeSAvdG1wCiAgICAgIFJlc3RhcnQ9YWx3YXlzCiAgICAgIFtJbnN0YWxsXQogICAgICBXYW50ZWRCeT1tdWx0aS11c2VyLnRhcmdldApydW5jbWQ6CiAgLSBzeXN0ZW1jdGwgZGFlbW9uLXJlbG9hZAogIC0gc3lzdGVtY3RsIGVuYWJsZSAtLW5vdyBhcHAtbGlzdGVuZXIuc2VydmljZQo=",
+    "$fxv#1": "IyEvYmluL2Jhc2gKIyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQojIFByb2plY3QgMDUgLSBjb25maWd1cmUtd2ViLnNoCiMgUnVuIElOU0lERSB2bS13ZWIxIGJ5IHRoZSBDdXN0b20gU2NyaXB0IEV4dGVuc2lvbiAoYXMgcm9vdCkuCiMKIyBXaGF0IGl0IGRvZXMgKHRoZSAiY29udHJhY3RvcidzIGluc3RydWN0aW9ucyIpOgojICAgMS4gRmluZHMgdGhlIGRhdGEgZGlzayBhdHRhY2hlZCBhdCBMVU4gMCwgcGFydGl0aW9ucywgZm9ybWF0cyBhbmQgbW91bnRzIGl0CiMgICAgICBhdCAvZGF0YSAoYW5kIGFkZHMgaXQgdG8gL2V0Yy9mc3RhYiBzbyBpdCBzdXJ2aXZlcyByZWJvb3RzKQojICAgMi4gSW5zdGFsbHMgTmdpbnggKG5lZWRzIG91dGJvdW5kIGludGVybmV0IC0gcHJvdmlkZWQgYnkgdGhlIE5BVCBHYXRld2F5KQojICAgMy4gUHVibGlzaGVzIGEgd2ViIHBhZ2UsIHN0b3JlZCBvbiB0aGUgZGF0YSBkaXNrLCBzaG93aW5nIHRoZSBzZXJ2ZXIgbmFtZQojCiMgU2FmZSB0byBydW4gbW9yZSB0aGFuIG9uY2UgKGlkZW1wb3RlbnQpLgojIExvZyBmaWxlIGluc2lkZSB0aGUgVk06IC92YXIvbG9nL2NvbmZpZ3VyZS13ZWIubG9nCiMgPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0Kc2V0IC1ldW8gcGlwZWZhaWwKZXhlYyA+ID4odGVlIC1hIC92YXIvbG9nL2NvbmZpZ3VyZS13ZWIubG9nKSAyPiYxCmVjaG8gIj09PSBjb25maWd1cmUtd2ViLnNoIHN0YXJ0ZWQgJChkYXRlIC11KSA9PT0iCgojIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIDEuIERhdGEgZGlzayAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiMgQXp1cmUgY3JlYXRlcyBzdGFibGUgbGlua3MgZm9yIGRhdGEgZGlza3MgYnkgTFVOIG51bWJlcgpESVNLPSIiCmZvciBMSU5LIGluIC9kZXYvZGlzay9henVyZS9kYXRhL2J5LWx1bi8wIC9kZXYvZGlzay9henVyZS9zY3NpMS9sdW4wOyBkbwogIGlmIFsgLWUgIiRMSU5LIiBdOyB0aGVuCiAgICBESVNLPSQocmVhZGxpbmsgLWYgIiRMSU5LIikKICAgIGJyZWFrCiAgZmkKZG9uZQppZiBbIC16ICIkRElTSyIgXTsgdGhlbgogIGVjaG8gIkVSUk9SOiBubyBkYXRhIGRpc2sgZm91bmQgYXQgTFVOIDAuIEF0dGFjaCBhIGRhdGEgZGlzayB0byB0aGUgVk0gZmlyc3QuIgogIGV4aXQgMQpmaQplY2hvICJEYXRhIGRpc2sgZm91bmQ6ICRESVNLIgoKY2FzZSAiJERJU0siIGluCiAgKm52bWUqKSBQQVJUPSIke0RJU0t9cDEiIDs7CiAgKikgICAgICBQQVJUPSIke0RJU0t9MSIgOzsKZXNhYwoKaWYgbW91bnRwb2ludCAtcSAvZGF0YTsgdGhlbgogIGVjaG8gIi9kYXRhIGlzIGFscmVhZHkgbW91bnRlZCAtIHNraXBwaW5nIGRpc2sgc2V0dXAiCmVsc2UKICBpZiBbICEgLWIgIiRQQVJUIiBdOyB0aGVuCiAgICBlY2hvICJDcmVhdGluZyBwYXJ0aXRpb24gYW5kIGV4dDQgZmlsZSBzeXN0ZW0gb24gJERJU0suLi4iCiAgICBwYXJ0ZWQgLXMgIiRESVNLIiBta2xhYmVsIGdwdCBta3BhcnQgcHJpbWFyeSBleHQ0IDAlIDEwMCUKICAgIHBhcnRwcm9iZSAiJERJU0siCiAgICB1ZGV2YWRtIHNldHRsZQogICAgbWtmcy5leHQ0IC1xIC1MIGRhdGFkaXNrICIkUEFSVCIKICBmaQogIG1rZGlyIC1wIC9kYXRhCiAgVVVJRD0kKGJsa2lkIC1zIFVVSUQgLW8gdmFsdWUgIiRQQVJUIikKICAjIG5vZmFpbCA9IHRoZSBWTSBzdGlsbCBib290cyBpZiB0aGUgZGlzayBpcyBldmVyIGRldGFjaGVkCiAgZ3JlcCAtcSAiJFVVSUQiIC9ldGMvZnN0YWIgfHwgZWNobyAiVVVJRD0kVVVJRCAvZGF0YSBleHQ0IGRlZmF1bHRzLG5vZmFpbCAwIDIiID4+IC9ldGMvZnN0YWIKICBtb3VudCAvZGF0YQogIGVjaG8gIk1vdW50ZWQgJFBBUlQgYXQgL2RhdGEiCmZpCgojIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIDIuIE5naW54IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCmV4cG9ydCBERUJJQU5fRlJPTlRFTkQ9bm9uaW50ZXJhY3RpdmUKZWNobyAiSW5zdGFsbGluZyBOZ2lueC4uLiIKYXB0LWdldCB1cGRhdGUgLXkgLXEKYXB0LWdldCBpbnN0YWxsIC15IC1xIG5naW54CgojIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tIDMuIFdlYiBwYWdlIG9uIHRoZSBkYXRhIGRpc2sgLS0tLS0tLS0tLS0tLS0tLS0tCm1rZGlyIC1wIC9kYXRhL3d3dwpjYXQgPiAvZGF0YS93d3cvaW5kZXguaHRtbCA8PEVPRgo8IURPQ1RZUEUgaHRtbD4KPGh0bWw+CjxoZWFkPjx0aXRsZT5BWi0xMDQgUHJvamVjdCAwNTwvdGl0bGU+PC9oZWFkPgo8Ym9keSBzdHlsZT0iZm9udC1mYW1pbHk6IHNhbnMtc2VyaWY7IG1hcmdpbjogNDBweDsiPgogIDxoMT5BWi0xMDQgUHJvamVjdCAwNSAtICQoaG9zdG5hbWUpPC9oMT4KICA8cD5Qcml2YXRlIElQOiAkKGhvc3RuYW1lIC1JIHwgYXdrICd7cHJpbnQgJDF9Jyk8L3A+CiAgPHA+Q29uZmlndXJlZCBieSB0aGUgQ3VzdG9tIFNjcmlwdCBFeHRlbnNpb24gYXQgJChkYXRlIC11KSBVVEM8L3A+CiAgPHA+VGhpcyBwYWdlIGlzIHNlcnZlZCBmcm9tIHRoZSBkYXRhIGRpc2sgbW91bnRlZCBhdCAvZGF0YS48L3A+CjwvYm9keT4KPC9odG1sPgpFT0YKCiMgUG9pbnQgTmdpbnggYXQgdGhlIGRhdGEgZGlzayBpbnN0ZWFkIG9mIHRoZSBPUyBkaXNrCnNlZCAtaSAncyNyb290IC92YXIvd3d3L2h0bWw7I3Jvb3QgL2RhdGEvd3d3OyMnIC9ldGMvbmdpbngvc2l0ZXMtYXZhaWxhYmxlL2RlZmF1bHQKc3lzdGVtY3RsIGVuYWJsZSBuZ2lueApzeXN0ZW1jdGwgcmVzdGFydCBuZ2lueAoKIyAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSBTdW1tYXJ5IC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQplY2hvICIiCmVjaG8gIj09PSBEaXNrcyA9PT0iCmxzYmxrIC1vIE5BTUUsU0laRSxUWVBFLE1PVU5UUE9JTlQKZWNobyAiIgplY2hvICI9PT0gL2RhdGEgPT09IgpkZiAtaCAvZGF0YQplY2hvICIiCmVjaG8gIj09PSBOZ2lueCA9PT0iCnN5c3RlbWN0bCBpcy1hY3RpdmUgbmdpbngKZWNobyAiPT09IGNvbmZpZ3VyZS13ZWIuc2ggZmluaXNoZWQgJChkYXRlIC11KSA9PT0iCg==",
+    "vnetName": "vnet-az104-project05",
+    "webPrefix": "10.10.1.0/24",
+    "appPrefix": "10.10.2.0/24",
+    "bastionPrefix": "10.10.254.0/26",
+    "mgmtFromBastion": {
+      "priority": 110,
+      "direction": "Inbound",
+      "access": "Allow",
+      "protocol": "Tcp",
+      "sourceAddressPrefix": "[variables('bastionPrefix')]",
+      "sourcePortRange": "*",
+      "destinationPortRanges": [
+        "22",
+        "3389"
+      ]
+    },
+    "denyVnetInbound": {
+      "priority": 4000,
+      "direction": "Inbound",
+      "access": "Deny",
+      "protocol": "*",
+      "sourceAddressPrefix": "VirtualNetwork",
+      "sourcePortRange": "*",
+      "destinationAddressPrefix": "*",
+      "destinationPortRange": "*"
+    },
+    "vms": [
+      {
+        "name": "vm-web1",
+        "subnet": "snet-web",
+        "ip": "10.10.1.4",
+        "asgs": [
+          {
+            "id": "[resourceId('Microsoft.Network/applicationSecurityGroups', 'asg-web')]"
+          }
+        ],
+        "nicNsg": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-vm-web1')]",
+        "dataDiskGB": 4,
+        "customData": ""
+      },
+      {
+        "name": "vm-web2",
+        "subnet": "snet-web",
+        "ip": "10.10.1.5",
+        "asgs": [],
+        "nicNsg": "",
+        "dataDiskGB": 0,
+        "customData": ""
+      },
+      {
+        "name": "vm-app",
+        "subnet": "snet-app",
+        "ip": "10.10.2.4",
+        "asgs": [
+          {
+            "id": "[resourceId('Microsoft.Network/applicationSecurityGroups', 'asg-app')]"
+          }
+        ],
+        "nicNsg": "",
+        "dataDiskGB": 0,
+        "customData": "[variables('$fxv#0')]"
+      }
+    ]
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/applicationSecurityGroups",
+      "apiVersion": "2024-05-01",
+      "name": "asg-web",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]"
+    },
+    {
+      "type": "Microsoft.Network/applicationSecurityGroups",
+      "apiVersion": "2024-05-01",
+      "name": "asg-app",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]"
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2024-05-01",
+      "name": "nsg-web",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow-HTTPS-Internet",
+            "properties": {
+              "priority": 100,
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "Tcp",
+              "sourceAddressPrefix": "Internet",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "[variables('webPrefix')]",
+              "destinationPortRange": "443"
+            }
+          },
+          {
+            "name": "Allow-Mgmt-Bastion",
+            "properties": "[union(variables('mgmtFromBastion'), createObject('destinationAddressPrefix', variables('webPrefix')))]"
+          },
+          {
+            "name": "Deny-VNet-Inbound",
+            "properties": "[variables('denyVnetInbound')]"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2024-05-01",
+      "name": "nsg-app",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow-App-From-ASG-Web",
+            "properties": {
+              "priority": 100,
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "Tcp",
+              "sourceApplicationSecurityGroups": [
+                {
+                  "id": "[resourceId('Microsoft.Network/applicationSecurityGroups', 'asg-web')]"
+                }
+              ],
+              "sourcePortRange": "*",
+              "destinationApplicationSecurityGroups": [
+                {
+                  "id": "[resourceId('Microsoft.Network/applicationSecurityGroups', 'asg-app')]"
+                }
+              ],
+              "destinationPortRange": "8080",
+              "description": "Only VMs with the asg-web badge may reach asg-app on 8080"
+            }
+          },
+          {
+            "name": "Allow-Mgmt-Bastion",
+            "properties": "[union(variables('mgmtFromBastion'), createObject('destinationAddressPrefix', variables('appPrefix')))]"
+          },
+          {
+            "name": "Deny-VNet-Inbound",
+            "properties": "[variables('denyVnetInbound')]"
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/applicationSecurityGroups', 'asg-app')]",
+        "[resourceId('Microsoft.Network/applicationSecurityGroups', 'asg-web')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2024-05-01",
+      "name": "nsg-vm-web1",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Deny-RDP-Host",
+            "properties": {
+              "priority": 100,
+              "direction": "Inbound",
+              "access": "Deny",
+              "protocol": "Tcp",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "3389",
+              "description": "Host-level control: Linux never needs RDP"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2024-05-01",
+      "name": "pip-nat-az104-project05",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "publicIPAddressVersion": "IPv4"
+      }
+    },
+    {
+      "type": "Microsoft.Network/natGateways",
+      "apiVersion": "2024-05-01",
+      "name": "nat-az104-project05",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+        "idleTimeoutInMinutes": 4,
+        "publicIpAddresses": [
+          {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-nat-az104-project05')]"
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-nat-az104-project05')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2024-05-01",
+      "name": "[variables('vnetName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.10.0.0/16"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "snet-web",
+            "properties": {
+              "addressPrefix": "[variables('webPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-web')]"
+              },
+              "natGateway": {
+                "id": "[resourceId('Microsoft.Network/natGateways', 'nat-az104-project05')]"
+              },
+              "defaultOutboundAccess": false
+            }
+          },
+          {
+            "name": "snet-app",
+            "properties": {
+              "addressPrefix": "[variables('appPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-app')]"
+              },
+              "defaultOutboundAccess": false
+            }
+          },
+          {
+            "name": "AzureBastionSubnet",
+            "properties": {
+              "addressPrefix": "[variables('bastionPrefix')]"
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/natGateways', 'nat-az104-project05')]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-app')]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-web')]"
+      ]
+    },
+    {
+      "copy": {
+        "name": "nics",
+        "count": "[length(variables('vms'))]"
+      },
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2024-05-01",
+      "name": "[format('nic-{0}', variables('vms')[copyIndex()].name)]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "networkSecurityGroup": "[if(empty(variables('vms')[copyIndex()].nicNsg), null(), createObject('id', variables('vms')[copyIndex()].nicNsg))]",
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('vms')[copyIndex()].subnet)]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('vms')[copyIndex()].ip]",
+              "applicationSecurityGroups": "[variables('vms')[copyIndex()].asgs]"
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/applicationSecurityGroups', 'asg-app')]",
+        "[resourceId('Microsoft.Network/applicationSecurityGroups', 'asg-web')]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-vm-web1')]",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+      ]
+    },
+    {
+      "copy": {
+        "name": "virtualMachines",
+        "count": "[length(variables('vms'))]"
+      },
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2024-07-01",
+      "name": "[variables('vms')[copyIndex()].name]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "securityProfile": {
+          "securityType": "TrustedLaunch",
+          "uefiSettings": {
+            "secureBootEnabled": true,
+            "vTpmEnabled": true
+          }
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "Canonical",
+            "offer": "ubuntu-24_04-lts",
+            "sku": "server",
+            "version": "latest"
+          },
+          "osDisk": {
+            "createOption": "FromImage",
+            "deleteOption": "Delete",
+            "managedDisk": {
+              "storageAccountType": "Standard_LRS"
+            }
+          },
+          "dataDisks": "[if(greater(variables('vms')[copyIndex()].dataDiskGB, 0), createArray(createObject('lun', 0, 'name', format('{0}-datadisk', variables('vms')[copyIndex()].name), 'createOption', 'Empty', 'diskSizeGB', variables('vms')[copyIndex()].dataDiskGB, 'deleteOption', 'Delete', 'managedDisk', createObject('storageAccountType', 'Standard_LRS'))), createArray())]"
+        },
+        "osProfile": {
+          "computerName": "[variables('vms')[copyIndex()].name]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "customData": "[if(empty(variables('vms')[copyIndex()].customData), null(), variables('vms')[copyIndex()].customData)]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[format('/home/{0}/.ssh/authorized_keys', parameters('adminUsername'))]",
+                  "keyData": "[parameters('adminPublicKey')]"
+                }
+              ]
+            }
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', format('nic-{0}', variables('vms')[copyIndex()].name))]",
+              "properties": {
+                "deleteOption": "Delete"
+              }
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/applicationSecurityGroups', 'asg-app')]",
+        "[resourceId('Microsoft.Network/applicationSecurityGroups', 'asg-web')]",
+        "[resourceId('Microsoft.Network/networkInterfaces', format('nic-{0}', variables('vms')[copyIndex()].name))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-vm-web1')]"
+      ]
+    },
+    {
+      "copy": {
+        "name": "shutdown",
+        "count": "[length(variables('vms'))]"
+      },
+      "type": "Microsoft.DevTestLab/schedules",
+      "apiVersion": "2018-09-15",
+      "name": "[format('shutdown-computevm-{0}', variables('vms')[copyIndex()].name)]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "status": "Enabled",
+        "taskType": "ComputeVmShutdownTask",
+        "dailyRecurrence": {
+          "time": "[parameters('shutdownTime')]"
+        },
+        "timeZoneId": "[parameters('timeZoneId')]",
+        "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', variables('vms')[copyIndex()].name)]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/applicationSecurityGroups', 'asg-app')]",
+        "[resourceId('Microsoft.Network/applicationSecurityGroups', 'asg-web')]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-vm-web1')]",
+        "[resourceId('Microsoft.Compute/virtualMachines', variables('vms')[copyIndex()].name)]"
+      ]
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2024-07-01",
+      "name": "[format('{0}/{1}', variables('vms')[0].name, 'CustomScript')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.1",
+        "autoUpgradeMinorVersion": true,
+        "protectedSettings": {
+          "script": "[variables('$fxv#1')]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines', variables('vms')[0].name)]"
+      ]
+    }
+  ],
+  "outputs": {
+    "natPublicIp": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', 'pip-nat-az104-project05'), '2024-05-01').ipAddress]"
+    },
+    "vmNames": {
+      "type": "array",
+      "copy": {
+        "count": "[length(variables('vms'))]",
+        "input": "[variables('vms')[copyIndex()].name]"
+      }
+    }
+  }
+}

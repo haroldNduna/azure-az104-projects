@@ -1,0 +1,88 @@
+>> Pre-check: is vm-app listening on TCP 8080 (cloud-init)?
+   ✔ LISTENER-UP
+
+================ TEST 1 – Application Security Groups ================
+   vm-web1 (asg-web)            -> vm-app:8080 : ALLOWED
+   vm-web2 (no ASG, same subnet) -> vm-app:8080 : BLOCKED
+
+================ TEST 2 – Extension, data disk, temp disk ================
+--- Disks ---
+NAME     SIZE TYPE MOUNTPOINT
+sda       30G disk 
+├─sda1    29G part /
+├─sda14    4M part 
+├─sda15  106M part /boot/efi
+└─sda16  913M part /boot
+sdb       16G disk 
+└─sdb1    16G part /mnt
+sdc        4G disk 
+└─sdc1     4G part /data
+sr0      628K rom  
+--- Data disk ---
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sdc1       3.9G   32K  3.7G   1% /data
+--- Temporary disk ---
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sdb1        16G   28K   15G   1% /mnt
+--- Web page ---
+<!DOCTYPE html>
+<html>
+<head><title>AZ-104 Project 05</title></head>
+<body style="font-family: sans-serif; margin: 40px;">
+  <h1>AZ-104 Project 05 - vm-web1</h1>
+  <p>Private IP: 10.10.1.4</p>
+  <p>Configured by the Custom Script Extension at Thu Nov 12 08:58:09 UTC 2026 UTC</p>
+  <p>This page is served from the data disk mounted at /data.</p>
+</body>
+</html>
+
+================ TEST 3 – NAT Gateway (controlled egress) ================
+   NAT Gateway public IP: 23.101.154.154
+   vm-web1 outbound IP  : 23.101.154.154
+   vm-app outbound      : NO-INTERNET
+
+================ TEST 4 – IP flow verify (subnet NSG + NIC NSG) ================
+   Bastion subnet -> vm-web1:22 : Allow  (rule: AllowVnetInBound)
+   Bastion subnet -> vm-web1:3389 : Deny  (rule: Deny-RDP-Host)
+
+================ TEST 5 – Effective security rules on vm-web1 ================
+
+   nsg-vm-web1 (applied to NIC) – inbound rules:
+        100  Deny   securityRules/Deny-RDP-Host             src=0.0.0.0/0                       ports=3389-3389
+      65000  Allow  defaultSecurityRules/AllowVnetInBound   src=VirtualNetwork                  ports=0-65535
+      65001  Allow  defaultSecurityRules/AllowAzureLoadBal  src=AzureLoadBalancer               ports=0-65535
+      65500  Deny   defaultSecurityRules/DenyAllInBound     src=0.0.0.0/0                       ports=0-65535
+
+   nsg-web (applied to subnet) – inbound rules:
+        100  Allow  securityRules/Allow-HTTPS-Internet      src=Internet                        ports=443-443
+        110  Allow  securityRules/Allow-Mgmt-Bastion        src=10.10.254.0/26                  ports=22-22
+       4000  Deny   securityRules/Deny-VNet-Inbound         src=VirtualNetwork                  ports=0-65535
+      65000  Allow  defaultSecurityRules/AllowVnetInBound   src=VirtualNetwork                  ports=0-65535
+      65001  Allow  defaultSecurityRules/AllowAzureLoadBal  src=AzureLoadBalancer               ports=0-65535
+      65500  Deny   defaultSecurityRules/DenyAllInBound     src=0.0.0.0/0                       ports=0-65535
+   (could not read effective rules – check them in the portal)
+
+================ TEST 6 – Power states ================
+   Deallocating vm-web2 (its test is done)...
+Name     State
+-------  --------------
+vm-app   VM running
+vm-web1  VM running
+vm-web2  VM deallocated
+
+============================== SUMMARY ==============================
+Test                                                 Expected       Actual         Result
+1a vm-web1 (asg-web) -> vm-app:8080                  ALLOWED        ALLOWED        PASS
+1b vm-web2 (no ASG, same subnet) -> vm-app:8080      BLOCKED        BLOCKED        PASS
+2a Data disk mounted at /data                        MOUNTED        MOUNTED        PASS
+2b Nginx serving page from /data                     SERVING        SERVING        PASS
+3a vm-web1 egress via NAT public IP                  NAT-IP         NAT-IP         PASS
+3b vm-app (private subnet, no NAT) egress            NO-INTERNET    NO-INTERNET    PASS
+4a Bastion subnet -> vm-web1:22 (SSH)                Allow          Allow          PASS
+4b Bastion subnet -> vm-web1:3389 (RDP)              Deny           Deny           PASS
+5 Effective NSGs on vm-web1 (subnet + NIC)           2              3              CHECK
+6 vm-web2 deallocated (no compute billing)           VM deallocated VM deallocated PASS
+Passed: 9 / 10
+
+Results saved to test-results.txt
+⚠ vm-web1, vm-app and the NAT Gateway are still running (~$0.25/hour). Run ./cleanup.sh when done.

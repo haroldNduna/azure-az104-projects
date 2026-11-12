@@ -1,0 +1,26 @@
+#cloud-config
+# =============================================================================
+# Project 05 - cloud-init for vm-app
+# Pasted into the "Custom data" box when creating vm-app (Advanced tab).
+# Runs ONCE, at first boot (the "move-in day checklist").
+#
+# Starts a tiny web server on TCP 8080 as a stand-in for an application.
+# Uses Python, which is already in the Ubuntu image, so no internet is needed
+# (the app subnet is private and has no NAT Gateway).
+# =============================================================================
+package_update: false
+package_upgrade: false
+write_files:
+  - path: /etc/systemd/system/app-listener.service
+    content: |
+      [Unit]
+      Description=AZ-104 Project 05 test application on TCP 8080
+      After=network-online.target
+      [Service]
+      ExecStart=/usr/bin/python3 -m http.server 8080 --directory /tmp
+      Restart=always
+      [Install]
+      WantedBy=multi-user.target
+runcmd:
+  - systemctl daemon-reload
+  - systemctl enable --now app-listener.service

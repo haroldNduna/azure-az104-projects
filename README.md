@@ -29,7 +29,7 @@ Projects are numbered in the order they are built. From Project 04 onwards they 
 | 02 | [Azure Storage Account](./project-02-storage-account/) | ⭐⭐ | Manage storage | 2.0, 4.0, 5.0 | ✅ Complete |
 | 03 | [Virtual Network & Subnets](./project-03-virtual-network/) | ⭐⭐ | Manage networking | 2.0 | ✅ Complete |
 | 04 | [Network Security Groups](./project-04-nsg/) | ⭐⭐⭐ | Implement and manage virtual networking | 2.0, 3.0 | ✅ Complete |
-| 05 | [Virtual Machines, ASGs & Extensions](./project-05-vm-asg-extensions/) | ⭐⭐⭐ | Deploy and manage compute resources | 2.0, 4.0 | ⏳ Planned |
+| 05 | [Virtual Machines, ASGs & Extensions](./project-05-vm-asg-extensions/) | ⭐⭐⭐ | Deploy and manage compute resources | 2.0, 4.0 | ✅ Complete |
 | 06 | [Standard Load Balancer with Two VMs](./project-06-load-balancer/) | ⭐⭐⭐⭐ | Implement and manage virtual networking | 3.0 | ⏳ Planned |
 | 07 | [Hub-Spoke Peering, Route Table & Bastion](./project-07-hub-spoke/) | ⭐⭐⭐⭐ | Implement and manage virtual networking | 2.0, 3.0 | ⏳ Planned |
 | 08 | [Azure DNS (Private & Public Zones)](./project-08-azure-dns/) | ⭐⭐⭐⭐ | Implement and manage virtual networking | 3.0, 4.0 | ⏳ Planned |

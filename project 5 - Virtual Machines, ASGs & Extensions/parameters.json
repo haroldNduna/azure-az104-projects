@@ -1,0 +1,29 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "eastus2"
+    },
+    "vmSize": {
+      "value": "Standard_D2s_v3"
+    },
+    "adminUsername": {
+      "value": "azureuser"
+    },
+    "shutdownTime": {
+      "value": "1900"
+    },
+    "timeZoneId": {
+      "value": "Central European Standard Time"
+    },
+    "tags": {
+      "value": {
+        "Environment": "Lab",
+        "CostCenter": "IT-Services",
+        "Owner": "Harold Nduna",
+        "Project": "AZ104-Project05"
+      }
+    }
+  }
+}
