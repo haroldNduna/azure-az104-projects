@@ -117,7 +117,6 @@ vm-web2 (no ASG, same subnet) ──8080──▶ vm-app (asg-app)   ✖ BLOCKED
 
 | Tool | Purpose |
 |---|---|
-| Azure Portal | Manual build (`portal-walkthrough.md`), tests and screenshots |
 | Azure CLI (Bash) | `deploy.sh`, `test-vm.sh`, `cleanup.sh` |
 | Azure PowerShell | `deploy.ps1` (reference) |
 | Bicep / ARM | `main.bicep`, `azuredeploy.json` |
@@ -130,7 +129,6 @@ vm-web2 (no ASG, same subnet) ──8080──▶ vm-app (asg-app)   ✖ BLOCKED
 
 | File | Description |
 |---|---|
-| `portal-walkthrough.md` | Step-by-step portal build, tests and cleanup |
 | `deploy.sh` | Azure CLI deployment with verification output |
 | `test-vm.sh` | Runs all tests and saves `test-results.txt` |
 | `cleanup.sh` | Safe teardown with typed confirmation |
@@ -164,7 +162,7 @@ vm-web2 (no ASG, same subnet) ──8080──▶ vm-app (asg-app)   ✖ BLOCKED
 
 ### Method 1: Azure Portal
 
-See [`portal-walkthrough.md`](portal-walkthrough.md).
+
 
 ### Method 2: Azure CLI (Bash) – Primary
 
@@ -266,8 +264,6 @@ screenshots/
 Each folder is numbered from `00` in the order the steps were done. Subscription IDs, tenant IDs and email addresses are blurred.
 
 ### Portal (GUI) – `screenshots/gui/`
-
-Built step by step from [`portal-walkthrough.md`](portal-walkthrough.md), then tested with Run command, Network Watcher and the portal Stop button.
 
 | File | Shows |
 |---|---|
