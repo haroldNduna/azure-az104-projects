@@ -1,0 +1,434 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.48.1.52935",
+      "templateHash": "16399692348668828789"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Azure region."
+      }
+    },
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Standard_D2als_v6",
+      "metadata": {
+        "description": "VM size. D2als_v6 was the only small size allowed in zones for this subscription."
+      }
+    },
+    "vmZones": {
+      "type": "array",
+      "defaultValue": [
+        "1",
+        "3"
+      ],
+      "metadata": {
+        "description": "Availability zones for vm-lb1 and vm-lb2 (must be different)."
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "defaultValue": "azureuser",
+      "metadata": {
+        "description": "Admin username."
+      }
+    },
+    "adminPublicKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "SSH public key (contents of ~/.ssh/id_rsa.pub)."
+      }
+    },
+    "shutdownTime": {
+      "type": "string",
+      "defaultValue": "1900",
+      "metadata": {
+        "description": "Daily auto-shutdown time (24h)."
+      }
+    },
+    "timeZoneId": {
+      "type": "string",
+      "defaultValue": "Central European Standard Time",
+      "metadata": {
+        "description": "Time zone for auto-shutdown."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {
+        "Environment": "Lab",
+        "CostCenter": "IT-Services",
+        "Owner": "Harold Nduna",
+        "Project": "AZ104-Project06"
+      },
+      "metadata": {
+        "description": "Tags applied to every resource."
+      }
+    }
+  },
+  "variables": {
+    "$fxv#0": "I2Nsb3VkLWNvbmZpZwojID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiMgUHJvamVjdCAwNiAtIGNsb3VkLWluaXQgZm9yIHZtLWxiMSBhbmQgdm0tbGIyCiMgUGFzdGUgdGhlIFdIT0xFIGZpbGUgaW50byB0aGUgIkN1c3RvbSBkYXRhIiBib3ggd2hlbiBjcmVhdGluZyBlYWNoIFZNCiMgKEFkdmFuY2VkIHRhYikuIFJ1bnMgT05DRSwgYXQgZmlyc3QgYm9vdC4KIwojIEluc3RhbGxzIE5naW54IGFuZCBwdWJsaXNoZXMgYSBwYWdlIHNob3dpbmcgV0hJQ0ggc2VydmVyIGFuZCBXSElDSAojIGF2YWlsYWJpbGl0eSB6b25lIGFuc3dlcmVkIC0gc28geW91IGNhbiBzZWUgdGhlIGxvYWQgYmFsYW5jZXIgYXQgd29yay4KIwojIE5lZWRzIG91dGJvdW5kIGludGVybmV0IGZvciBhcHQ6IHByb3ZpZGVkIGJ5IHRoZSBsb2FkIGJhbGFuY2VyJ3MKIyBPVVRCT1VORCBSVUxFLCBzbyB0aGUgVk0gbXVzdCBiZSBpbiB0aGUgYmFja2VuZCBwb29sIHdoZW4gaXQgaXMgY3JlYXRlZC4KIyBQbGFpbiBBU0NJSSBvbmx5ICh0aGUgQXp1cmUgQ0xJIHJlamVjdHMgc29tZSBzcGVjaWFsIGNoYXJhY3RlcnMpLgojID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CnBhY2thZ2VfdXBkYXRlOiB0cnVlCnBhY2thZ2VzOgogIC0gbmdpbngKcnVuY21kOgogIC0gWyBzaCwgLWMsICdaT05FPSQoY3VybCAtcyAtSCBNZXRhZGF0YTp0cnVlICJodHRwOi8vMTY5LjI1NC4xNjkuMjU0L21ldGFkYXRhL2luc3RhbmNlL2NvbXB1dGUvem9uZT9hcGktdmVyc2lvbj0yMDIxLTAyLTAxJmZvcm1hdD10ZXh0Iik7IElQPSQoaG9zdG5hbWUgLUkpOyBJUD0ke0lQJSUgKn07IHByaW50ZiAiPCFET0NUWVBFIGh0bWw+XG48aHRtbD48aGVhZD48dGl0bGU+QVotMTA0IFByb2plY3QgMDY8L3RpdGxlPjwvaGVhZD5cbjxib2R5IHN0eWxlPVwiZm9udC1mYW1pbHk6IHNhbnMtc2VyaWY7IG1hcmdpbjogNDBweDtcIj5cbjxoMT5TZXJ2ZWQgYnk6ICVzPC9oMT5cbjxwPkF2YWlsYWJpbGl0eSB6b25lOiAlczwvcD5cbjxwPlByaXZhdGUgSVA6ICVzPC9wPlxuPHA+QmVoaW5kIGEgU3RhbmRhcmQgTG9hZCBCYWxhbmNlciAtIHJlZnJlc2ggdG8gc2VlIHRoZSBvdGhlciBzZXJ2ZXIuPC9wPlxuPC9ib2R5PjwvaHRtbD5cbiIgIiQoaG9zdG5hbWUpIiAiJHtaT05FOi1ub25lfSIgIiRJUCIgPiAvdmFyL3d3dy9odG1sL2luZGV4Lmh0bWwnIF0KICAtIHN5c3RlbWN0bCBlbmFibGUgLS1ub3cgbmdpbngK",
+    "lbName": "lb-az104-project06",
+    "feName": "fe-web",
+    "poolName": "bepool-web",
+    "probeName": "probe-http",
+    "webPrefix": "10.10.1.0/24",
+    "bastionPrefix": "10.10.254.0/26",
+    "feId": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations', variables('lbName'), variables('feName'))]",
+    "poolId": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('lbName'), variables('poolName'))]",
+    "probeId": "[resourceId('Microsoft.Network/loadBalancers/probes', variables('lbName'), variables('probeName'))]",
+    "vms": [
+      {
+        "name": "vm-lb1",
+        "ip": "10.10.1.4",
+        "zone": "[parameters('vmZones')[0]]"
+      },
+      {
+        "name": "vm-lb2",
+        "ip": "10.10.1.5",
+        "zone": "[parameters('vmZones')[1]]"
+      }
+    ]
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2024-05-01",
+      "name": "nsg-web",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "Allow-HTTP-Internet",
+            "properties": {
+              "priority": 100,
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "Tcp",
+              "sourceAddressPrefix": "Internet",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "[variables('webPrefix')]",
+              "destinationPortRange": "80",
+              "description": "Standard LB is secure by default - this rule lets web traffic in"
+            }
+          },
+          {
+            "name": "Allow-Mgmt-Bastion",
+            "properties": {
+              "priority": 110,
+              "direction": "Inbound",
+              "access": "Allow",
+              "protocol": "Tcp",
+              "sourceAddressPrefix": "[variables('bastionPrefix')]",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "[variables('webPrefix')]",
+              "destinationPortRanges": [
+                "22",
+                "3389"
+              ]
+            }
+          },
+          {
+            "name": "Deny-VNet-Inbound",
+            "properties": {
+              "priority": 4000,
+              "direction": "Inbound",
+              "access": "Deny",
+              "protocol": "*",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "*"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2024-05-01",
+      "name": "vnet-az104-project06",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.10.0.0/16"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "snet-web",
+            "properties": {
+              "addressPrefix": "[variables('webPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-web')]"
+              },
+              "defaultOutboundAccess": false
+            }
+          },
+          {
+            "name": "AzureBastionSubnet",
+            "properties": {
+              "addressPrefix": "[variables('bastionPrefix')]"
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', 'nsg-web')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2024-05-01",
+      "name": "pip-lb-az104-project06",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "sku": {
+        "name": "Standard"
+      },
+      "zones": [
+        "1",
+        "2",
+        "3"
+      ],
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "publicIPAddressVersion": "IPv4"
+      }
+    },
+    {
+      "type": "Microsoft.Network/loadBalancers",
+      "apiVersion": "2024-05-01",
+      "name": "[variables('lbName')]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "sku": {
+        "name": "Standard",
+        "tier": "Regional"
+      },
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "[variables('feName')]",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-lb-az104-project06')]"
+              }
+            }
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "[variables('poolName')]"
+          }
+        ],
+        "probes": [
+          {
+            "name": "[variables('probeName')]",
+            "properties": {
+              "protocol": "Http",
+              "port": 80,
+              "requestPath": "/",
+              "intervalInSeconds": 5,
+              "probeThreshold": 1
+            }
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "rule-http",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('feId')]"
+              },
+              "backendAddressPool": {
+                "id": "[variables('poolId')]"
+              },
+              "probe": {
+                "id": "[variables('probeId')]"
+              },
+              "protocol": "Tcp",
+              "frontendPort": 80,
+              "backendPort": 80,
+              "idleTimeoutInMinutes": 4,
+              "enableTcpReset": true,
+              "disableOutboundSnat": true,
+              "loadDistribution": "Default"
+            }
+          }
+        ],
+        "outboundRules": [
+          {
+            "name": "rule-outbound",
+            "properties": {
+              "frontendIPConfigurations": [
+                {
+                  "id": "[variables('feId')]"
+                }
+              ],
+              "backendAddressPool": {
+                "id": "[variables('poolId')]"
+              },
+              "protocol": "All",
+              "idleTimeoutInMinutes": 4,
+              "enableTcpReset": true,
+              "allocatedOutboundPorts": 10000
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', 'pip-lb-az104-project06')]"
+      ]
+    },
+    {
+      "copy": {
+        "name": "nics",
+        "count": "[length(variables('vms'))]"
+      },
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2024-05-01",
+      "name": "[format('nic-{0}', variables('vms')[copyIndex()].name)]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet-az104-project06', 'snet-web')]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('vms')[copyIndex()].ip]",
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[reference(resourceId('Microsoft.Network/loadBalancers', variables('lbName')), '2024-05-01').backendAddressPools[0].id]"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/loadBalancers', variables('lbName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-az104-project06')]"
+      ]
+    },
+    {
+      "copy": {
+        "name": "virtualMachines",
+        "count": "[length(variables('vms'))]"
+      },
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2024-07-01",
+      "name": "[variables('vms')[copyIndex()].name]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "zones": [
+        "[variables('vms')[copyIndex()].zone]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "securityProfile": {
+          "securityType": "TrustedLaunch",
+          "uefiSettings": {
+            "secureBootEnabled": true,
+            "vTpmEnabled": true
+          }
+        },
+        "storageProfile": {
+          "diskControllerType": "NVMe",
+          "imageReference": {
+            "publisher": "Canonical",
+            "offer": "ubuntu-24_04-lts",
+            "sku": "server",
+            "version": "latest"
+          },
+          "osDisk": {
+            "createOption": "FromImage",
+            "deleteOption": "Delete",
+            "managedDisk": {
+              "storageAccountType": "Standard_LRS"
+            }
+          }
+        },
+        "osProfile": {
+          "computerName": "[variables('vms')[copyIndex()].name]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "customData": "[variables('$fxv#0')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[format('/home/{0}/.ssh/authorized_keys', parameters('adminUsername'))]",
+                  "keyData": "[parameters('adminPublicKey')]"
+                }
+              ]
+            }
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', format('nic-{0}', variables('vms')[copyIndex()].name))]",
+              "properties": {
+                "deleteOption": "Delete"
+              }
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', format('nic-{0}', variables('vms')[copyIndex()].name))]"
+      ]
+    },
+    {
+      "copy": {
+        "name": "shutdown",
+        "count": "[length(variables('vms'))]"
+      },
+      "type": "Microsoft.DevTestLab/schedules",
+      "apiVersion": "2018-09-15",
+      "name": "[format('shutdown-computevm-{0}', variables('vms')[copyIndex()].name)]",
+      "location": "[parameters('location')]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "status": "Enabled",
+        "taskType": "ComputeVmShutdownTask",
+        "dailyRecurrence": {
+          "time": "[parameters('shutdownTime')]"
+        },
+        "timeZoneId": "[parameters('timeZoneId')]",
+        "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines', variables('vms')[copyIndex()].name)]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines', variables('vms')[copyIndex()].name)]"
+      ]
+    }
+  ],
+  "outputs": {
+    "websiteUrl": {
+      "type": "string",
+      "value": "[format('http://{0}', reference(resourceId('Microsoft.Network/publicIPAddresses', 'pip-lb-az104-project06'), '2024-05-01').ipAddress)]"
+    }
+  }
+}

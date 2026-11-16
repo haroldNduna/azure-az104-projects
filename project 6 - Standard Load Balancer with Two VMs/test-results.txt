@@ -1,0 +1,62 @@
+Load balancer public IP: 74.155.215.86
+
+================ PRE-CHECK - VMs, cloud-init, Nginx ================
+   OK  vm-lb1: Served by: vm-lb1 Availability zone: 1 
+   OK  vm-lb2: Served by: vm-lb2 Availability zone: 3 
+
+================ TEST 1 - Secure by default ================
+   http://74.155.215.86 with no HTTP rule in nsg-web: BLOCKED
+
+================ TEST 2 - Add the NSG HTTP rule ================
+   + [100] Allow TCP 80 from Internet to 10.10.1.0/24
+   http://74.155.215.86 after adding the rule: WORKS
+     Served by: vm-lb1
+     Availability zone: 1
+
+================ TEST 3 - Distribution (5-tuple hash) ================
+   10 requests: vm-lb1=4  vm-lb2=6  no answer=0
+     vm-lb2 vm-lb1 vm-lb2 vm-lb1 vm-lb2 vm-lb1 vm-lb2 vm-lb2 vm-lb2 vm-lb1 
+
+================ TEST 4 - Failover (stop Nginx on vm-lb1) ================
+   nginx stopped on vm-lb1
+   
+   waiting 30 s for the health probe to mark vm-lb1 unhealthy...
+   10 requests: vm-lb1=0  vm-lb2=10  no answer=0
+     vm-lb2 vm-lb2 vm-lb2 vm-lb2 vm-lb2 vm-lb2 vm-lb2 vm-lb2 vm-lb2 vm-lb2 
+
+   Health Probe Status (metric DipAvailability, last 5 min, per backend IP):
+     (metric not available yet - check Monitoring -> Metrics in the portal)
+     100 = healthy, 0 = unhealthy (metrics can lag 1-3 minutes)
+
+================ TEST 5 - Recovery (start Nginx on vm-lb1) ================
+   nginx started on vm-lb1
+   
+   waiting 30 s for the probe to mark vm-lb1 healthy...
+   10 requests: vm-lb1=5  vm-lb2=5  no answer=0
+     vm-lb1 vm-lb2 vm-lb1 vm-lb2 vm-lb1 vm-lb2 vm-lb1 vm-lb2 vm-lb1 vm-lb2 
+
+================ TEST 6 - Session persistence: Client IP ================
+   rule-http load distribution = SourceIP (Client IP). Waiting 60 s...
+   10 requests: vm-lb1=0  vm-lb2=10  no answer=0
+     vm-lb2 vm-lb2 vm-lb2 vm-lb2 vm-lb2 vm-lb2 vm-lb2 vm-lb2 vm-lb2 vm-lb2 
+   reverted rule-http to Default (5-tuple)
+
+================ TEST 7 - Outbound rule ================
+   vm-lb1 outbound IP: 74.155.215.86   load balancer IP: 74.155.215.86
+
+============================== SUMMARY ==============================
+Test                                           Expected           Actual             Result
+1 No NSG HTTP rule -> website                  BLOCKED            BLOCKED            PASS
+2 With HTTP rule -> website                    WORKS              WORKS              PASS
+3 Requests spread across both VMs              BOTH               BOTH               PASS
+4 vm-lb1 down -> traffic to                    VM-LB2-ONLY        VM-LB2-ONLY        PASS
+5 vm-lb1 back -> traffic to                    BOTH               BOTH               PASS
+6 Client IP persistence -> traffic to          ONE-SERVER         ONE-SERVER         PASS
+7 vm-lb1 egress via LB outbound rule           LB-IP              LB-IP              PASS
+Passed: 7 / 7
+
+Note: Test 3 can occasionally show one server only - the 5-tuple hash is
+per connection, not round-robin. Re-run the loop and it will mix.
+
+Results saved to test-results.txt
+The VMs and load balancer are still running (~$0.19/hour). Run ./cleanup.sh when done.
