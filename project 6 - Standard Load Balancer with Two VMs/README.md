@@ -40,7 +40,7 @@ It also shows that the **Standard Load Balancer is secure by default**: the webs
 
 ## Architecture
 
-![Architecture diagram](project 6 architecture diagram.jpg)
+![Architecture diagram](project%206%20architecture%20diagram.jpg)
 
 | Component | Name | Details |
 |---|---|---|
@@ -110,7 +110,7 @@ The rule's destination is the **VM subnet**, not the load balancer: the load bal
 | `deploy.ps1` | Azure PowerShell equivalent |
 | `scripts/cloud-init-web.yaml` | First-boot config: Nginx + "Served by / zone" page |
 | `notes-tips-tricks.md` | AZ-104 exam notes on load balancing |
-| `architecture-diagram.drawio` / `.png` | Architecture diagram |
+| `project 6 architecture diagram.jpg` | Architecture diagram |
 | `test-results.txt` | Output of `test-lb.sh` |
 | `screenshots/gui/` | Portal build and test evidence |
 | `screenshots/cli/` | CLI build and test evidence |
