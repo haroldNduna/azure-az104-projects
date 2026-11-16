@@ -110,7 +110,7 @@ Every NSG also contains the six built-in default rules (AllowVnetInBound, AllowA
 | Azure CLI (Bash) | Primary deployment (`deploy.sh`) and testing (`test-nsg.sh`) |
 | Azure PowerShell | Alternative deployment (`deploy.ps1`) |
 | Bicep / ARM | Infrastructure as Code (`main.bicep`, `azuredeploy.json`) |
-| Azure Portal | Manual build (`portal-walkthrough.md`) and verification |
+| Azure Portal | Manual build and verification |
 | Network Watcher | IP flow verify, effective security rules |
 | draw.io | Architecture diagram |
 | Git / GitHub | Version control and portfolio |
@@ -126,7 +126,6 @@ Every NSG also contains the six built-in default rules (AllowVnetInBound, AllowA
 | `azuredeploy.json` | ARM template compiled from `main.bicep` |
 | `parameters.json` | Parameter file |
 | `cleanup.sh` | Safe teardown with typed confirmation |
-| `portal-walkthrough.md` | Step-by-step portal build and cleanup |
 | `notes-tips-tricks.md` | AZ-104 exam notes for NSGs |
 | `test-results.txt` | Saved output from `test-nsg.sh` |
 | `architecture-diagram.drawio` / `.png` | Architecture diagram |
@@ -264,7 +263,7 @@ az deployment group create \
 
 ### Method 6: Azure Portal
 
-See [`portal-walkthrough.md`](portal-walkthrough.md).
+The project was first built by hand in the Azure Portal: the resource group, the three NSGs and their rules, then the VNet with each NSG attached to its subnet. The rules were verified with a test VM, IP flow verify and effective security rules – see the screenshots below.
 
 ### Cleanup
 

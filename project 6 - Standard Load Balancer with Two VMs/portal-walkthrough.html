@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>portal-walkthrough</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<h1 id="project-06-azure-portal-walkthrough-standard-load-balancer-with-two-vms">Project 06 – Azure Portal Walkthrough: Standard Load Balancer with Two VMs</h1>
+<p>Build the whole project by hand in the Azure Portal. Portal labels change from time to time; if a name doesn’t match exactly, pick the closest option.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Time</strong></td>
+<td>About 3 hours (Part A–B: 30 min free; Parts C–H: about 2–2.5 hours charged)</td>
+</tr>
+<tr class="even">
+<td><strong>Region</strong></td>
+<td><strong>(US) East US 2</strong> for every resource</td>
+</tr>
+<tr class="odd">
+<td><strong>Cost</strong></td>
+<td>Free until Part C. From Part C: <strong>about $0.19 per hour</strong> (2 × D2als_v6 ≈ $0.16, load balancer ≈ $0.025, public IP ≈ $0.005)</td>
+</tr>
+<tr class="even">
+<td><strong>You need</strong></td>
+<td><code>scripts/cloud-init-web.yaml</code> from this folder</td>
+</tr>
+</tbody>
+</table>
+<h2 id="where-charging-starts-read-this-first">💰 Where charging starts – read this first</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Part</th>
+<th>What</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>A</strong></td>
+<td>Resource group, NSG and its rules</td>
+<td>✅ <strong>Free</strong></td>
+</tr>
+<tr class="even">
+<td><strong>B</strong></td>
+<td>VNet and subnets</td>
+<td>✅ <strong>Free</strong></td>
+</tr>
+<tr class="odd">
+<td>🛑</td>
+<td><strong>FREE STOPPING POINT</strong> – everything above can stay in place for days at no cost</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>C</strong></td>
+<td><strong>Public IP + Standard Load Balancer</strong></td>
+<td>💰 <strong>Charging starts</strong> – the public IP bills from creation; the load balancer bills once it has rules</td>
+</tr>
+<tr class="odd">
+<td><strong>D</strong></td>
+<td><strong>Two VMs</strong></td>
+<td>💰 ~$0.08 per hour each while running</td>
+</tr>
+<tr class="even">
+<td><strong>E–G</strong></td>
+<td>Tests and optional NAT rule demo</td>
+<td>💰 (uses the resources above)</td>
+</tr>
+<tr class="odd">
+<td><strong>H</strong></td>
+<td><strong>Delete the resource group</strong></td>
+<td>✅ Charging stops</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Plan:</strong> do Parts A–B whenever you like. Do <strong>Parts C to H in one sitting</strong> (about 2–2.5 hours) and finish with the cleanup.</p>
+<h3 id="what-youll-build">What you’ll build</h3>
+<pre><code>rg-az104-project06 (East US 2)
+│
+├── nsg-web                               ← floor guard on snet-web
+├── pip-lb-az104-project06 (zone-redundant) ← the building&#39;s front door
+├── lb-az104-project06 (Standard, public) ← the receptionist
+│     ├── frontend  fe-web  → pip-lb-az104-project06
+│     ├── backend pool  bepool-web  → vm-lb1, vm-lb2
+│     ├── health probe  probe-http  (HTTP :80 /)
+│     ├── LB rule  rule-http  (TCP 80 → 80)
+│     ├── outbound rule  rule-outbound  (lets the VMs download Nginx)
+│     └── (optional) inbound NAT rule  nat-ssh-vm-lb1  (50001 → vm-lb1:22)
+│
+└── vnet-az104-project06 (10.10.0.0/16)
+    ├── snet-web 10.10.1.0/24  (private, nsg-web)
+    │     ├── vm-lb1  Zone 1  no public IP  Nginx
+    │     └── vm-lb2  Zone 3  no public IP  Nginx
+    └── AzureBastionSubnet 10.10.254.0/26 (reserved for Project 07)</code></pre>
+<hr />
+<h1 id="part-a-resource-group-and-nsg-20-min-free">Part A – Resource group and NSG (≈ 20 min, FREE)</h1>
+<h2 id="step-0-sign-in-and-check-capacity">Step 0: Sign in and check capacity</h2>
+<ol type="1">
+<li><p>Go to <strong>portal.azure.com</strong>, sign in, and check the directory under your name is <strong>Default Directory</strong>.</p></li>
+<li><p><strong>Check the VM size is still available in zones 1 and 3</strong> (2 minutes – avoids building everything and then failing at the VMs). In your terminal:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="ex">az</span> vm list-skus --location eastus2 --size Standard_D2als_v6 <span class="kw">\</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>  <span class="ex">--query</span> <span class="st">&quot;[0].{Zones:locationInfo[0].zones, Restricted:restrictions[].restrictionInfo.zones}&quot;</span> -o json</span></code></pre></div>
+<p>Use two zones that appear under <strong>Zones</strong> but <strong>not</strong> under <strong>Restricted</strong>. The walkthrough uses <strong>1 and 3</strong>; swap in others if needed.</p>
+<blockquote>
+<p><strong>Why D2als_v6 and zones 1 and 3?</strong> The original plan used <code>Standard_D2s_v3</code> in zones 1 and 2, but a zone check showed D2s_v3 – and most other small sizes – <strong>restricted in every zone</strong> for this subscription in East US 2. Of the sizes checked, only <strong><code>Standard_D2als_v6</code></strong> (2 vCPU, 4 GB, AMD) was allowed in zones, and only in <strong>1 and 3</strong>.</p>
+</blockquote></li>
+<li><p><strong>Check your quota:</strong> <code>az vm list-usage --location eastus2 -o table | grep -iE "Dalv6|Dalsv6|Total Regional"</code>. Two D2als_v6 need <strong>4 free vCPUs</strong> in that family (the limit was 10, with none used).</p></li>
+</ol>
+<h2 id="step-1-resource-group">Step 1: Resource group</h2>
+<ol type="1">
+<li>Search <strong>Resource groups</strong> → <strong>+ Create</strong>.</li>
+<li><strong>Basics:</strong> Subscription = portfolio projects, Name = <code>rg-az104-project06</code>, Region = <strong>(US) East US 2</strong>.</li>
+<li><strong>Tags:</strong> <code>Environment = Lab</code>, <code>CostCenter = IT-Services</code>, <code>Owner = Harold Nduna</code>, <code>Project = AZ104-Project06</code>.</li>
+<li><strong>Review + create</strong> → <strong>Create</strong>.</li>
+</ol>
+<p>Use these four tags on <strong>every</strong> resource below.</p>
+<h2 id="step-2-nsg-deliberately-without-a-web-rule-yet">Step 2: NSG – deliberately WITHOUT a web rule (yet)</h2>
+<ol type="1">
+<li>Search <strong>Network security groups</strong> → <strong>+ Create</strong> → RG <code>rg-az104-project06</code>, Name <strong><code>nsg-web</code></strong>, Region <strong>East US 2</strong>, tags → <strong>Create</strong>.</li>
+<li>Open <code>nsg-web</code> → <strong>Settings → Inbound security rules → + Add</strong>. Add only these two (Source port ranges always <code>*</code>):</li>
+</ol>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Priority</th>
+<th>Name</th>
+<th>Source</th>
+<th>Source value</th>
+<th>Destination</th>
+<th>Dest. value</th>
+<th>Service / port</th>
+<th>Protocol</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>110</td>
+<td>Allow-Mgmt-Bastion</td>
+<td>IP Addresses</td>
+<td>10.10.254.0/26</td>
+<td>IP Addresses</td>
+<td>10.10.1.0/24</td>
+<td>Custom, <code>22,3389</code></td>
+<td>TCP</td>
+<td>Allow</td>
+</tr>
+<tr class="even">
+<td>4000</td>
+<td>Deny-VNet-Inbound</td>
+<td>Service Tag</td>
+<td>VirtualNetwork</td>
+<td>Any</td>
+<td>–</td>
+<td>Custom, <code>*</code></td>
+<td>Any</td>
+<td><strong>Deny</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Why no port 80 rule?</strong> Test 1 proves that a <strong>Standard Load Balancer is secure by default</strong>: the website won’t load until you add the HTTP rule in Part E.</p>
+</blockquote>
+<blockquote>
+<p><strong>Health probes are already allowed:</strong> the default rule <strong>AllowAzureLoadBalancerInBound (65001)</strong> lets probes from <code>168.63.129.16</code> through. Our Deny-VNet-Inbound rule doesn’t block them, because the <code>AzureLoadBalancer</code> tag is separate from <code>VirtualNetwork</code>.</p>
+</blockquote>
+<hr />
+<h1 id="part-b-network-10-min-free">Part B – Network (≈ 10 min, FREE)</h1>
+<h2 id="step-3-virtual-network">Step 3: Virtual network</h2>
+<ol type="1">
+<li>Search <strong>Virtual networks</strong> → <strong>+ Create</strong>.</li>
+<li><strong>Basics:</strong> RG <code>rg-az104-project06</code>, Name <code>vnet-az104-project06</code>, Region <strong>East US 2</strong>.</li>
+<li><strong>Security:</strong> leave Bastion, Firewall and DDoS <strong>off</strong>.</li>
+<li><strong>IP addresses:</strong> delete the <code>default</code> subnet, set the address space to <strong>10.10.0.0/16</strong>, then <strong>+ Add a subnet</strong>:</li>
+</ol>
+<table>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Starting address</th>
+<th>Size</th>
+<th>Private subnet</th>
+<th>NSG</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>snet-web</code></td>
+<td>10.10.1.0</td>
+<td>/24</td>
+<td>✅</td>
+<td><strong>nsg-web</strong></td>
+</tr>
+<tr class="even">
+<td><code>AzureBastionSubnet</code> (purpose: Azure Bastion)</td>
+<td>10.10.254.0</td>
+<td>/26</td>
+<td>–</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<ol start="5" type="1">
+<li><strong>Tags</strong> → <strong>Review + create</strong> → <strong>Create</strong>.</li>
+</ol>
+<blockquote>
+<p>The subnet is <strong>private</strong> – no default internet access. The VMs will get outbound internet through the load balancer’s <strong>outbound rule</strong> (Step 4).</p>
+</blockquote>
+<hr />
+<h1 id="free-stopping-point">🛑 FREE STOPPING POINT</h1>
+<p>Everything so far is <strong>free</strong> and can be left in place. <strong>Only continue when you have about 2–2.5 hours to finish Parts C–H in one go.</strong></p>
+<hr />
+<h1 id="part-c-load-balancer-25-min-charging-starts">Part C – Load balancer (≈ 25 min) 💰 CHARGING STARTS</h1>
+<h2 id="step-4-create-the-standard-load-balancer">Step 4: Create the Standard Load Balancer</h2>
+<p>Search <strong>Load balancers</strong> → <strong>+ Create</strong>.</p>
+<h3 id="basics">Basics</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Resource group</td>
+<td><code>rg-az104-project06</code></td>
+</tr>
+<tr class="even">
+<td>Name</td>
+<td><code>lb-az104-project06</code></td>
+</tr>
+<tr class="odd">
+<td>Region</td>
+<td><strong>East US 2</strong></td>
+</tr>
+<tr class="even">
+<td>SKU</td>
+<td><strong>Standard</strong> (Basic is retired)</td>
+</tr>
+<tr class="odd">
+<td>Type</td>
+<td><strong>Public</strong></td>
+</tr>
+<tr class="even">
+<td>Tier</td>
+<td><strong>Regional</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="frontend-ip-configuration-add-a-frontend-ip-configuration">Frontend IP configuration → + Add a frontend IP configuration</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Name</td>
+<td><code>fe-web</code></td>
+</tr>
+<tr class="even">
+<td>IP version</td>
+<td>IPv4</td>
+</tr>
+<tr class="odd">
+<td>IP type</td>
+<td>IP address</td>
+</tr>
+<tr class="even">
+<td>Public IP address</td>
+<td><strong>Create new</strong> → Name <code>pip-lb-az104-project06</code>, Availability zone <strong>Zone-redundant</strong> → <strong>Save</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Click <strong>Save</strong> / <strong>Add</strong>. The zone-redundant public IP means the front door survives a whole datacenter failing.</p>
+<h3 id="backend-pools-add-a-backend-pool">Backend pools → + Add a backend pool</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Name</td>
+<td><code>bepool-web</code></td>
+</tr>
+<tr class="even">
+<td>Virtual network</td>
+<td><code>vnet-az104-project06</code></td>
+</tr>
+<tr class="odd">
+<td>Backend pool configuration</td>
+<td><strong>NIC</strong></td>
+</tr>
+<tr class="even">
+<td>IP configurations</td>
+<td>Leave empty – the VMs join it when they’re created (Step 6)</td>
+</tr>
+</tbody>
+</table>
+<p>Click <strong>Save</strong>.</p>
+<h3 id="inbound-rules-add-a-load-balancing-rule">Inbound rules → + Add a load balancing rule</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Name</td>
+<td><code>rule-http</code></td>
+</tr>
+<tr class="even">
+<td>IP version</td>
+<td>IPv4</td>
+</tr>
+<tr class="odd">
+<td>Frontend IP address</td>
+<td><code>fe-web</code></td>
+</tr>
+<tr class="even">
+<td>Backend pool</td>
+<td><code>bepool-web</code></td>
+</tr>
+<tr class="odd">
+<td>Protocol</td>
+<td><strong>TCP</strong></td>
+</tr>
+<tr class="even">
+<td>Port</td>
+<td><strong>80</strong></td>
+</tr>
+<tr class="odd">
+<td>Backend port</td>
+<td><strong>80</strong></td>
+</tr>
+<tr class="even">
+<td>Health probe</td>
+<td><strong>Create new</strong> → Name <code>probe-http</code>, Protocol <strong>HTTP</strong>, Port <strong>80</strong>, Path <strong>/</strong>, Interval <strong>5</strong> seconds → <strong>Save</strong></td>
+</tr>
+<tr class="odd">
+<td>Session persistence</td>
+<td><strong>None</strong></td>
+</tr>
+<tr class="even">
+<td>Idle timeout (minutes)</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td>Enable TCP Reset</td>
+<td>✅</td>
+</tr>
+<tr class="even">
+<td>Enable Floating IP</td>
+<td>❌</td>
+</tr>
+<tr class="odd">
+<td>Outbound source network address translation (SNAT)</td>
+<td><strong>(Recommended) Use outbound rules to provide backend pool members access to the internet</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Click <strong>Save</strong>. Skip <strong>Inbound NAT rules</strong> for now (optional demo in Part G).</p>
+<h3 id="outbound-rules-add-an-outbound-rule">Outbound rules → + Add an outbound rule</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Name</td>
+<td><code>rule-outbound</code></td>
+</tr>
+<tr class="even">
+<td>IP version</td>
+<td>IPv4</td>
+</tr>
+<tr class="odd">
+<td>Frontend IP address</td>
+<td><code>fe-web</code></td>
+</tr>
+<tr class="even">
+<td>Protocol</td>
+<td><strong>All</strong></td>
+</tr>
+<tr class="odd">
+<td>Idle timeout (minutes)</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td>TCP Reset</td>
+<td>Enabled</td>
+</tr>
+<tr class="odd">
+<td>Backend pool</td>
+<td><code>bepool-web</code></td>
+</tr>
+<tr class="even">
+<td>Port allocation</td>
+<td><strong>Manually choose number of outbound ports</strong></td>
+</tr>
+<tr class="odd">
+<td>Choose by</td>
+<td><strong>Maximum number of backend instances</strong> → <strong>2</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Click <strong>Save</strong> / <strong>Add</strong>.</p>
+<blockquote>
+<p><strong>Outbound rule vs NAT Gateway:</strong> Project 05 used a NAT Gateway for outbound internet; this project uses a <strong>load balancer outbound rule</strong>. Both are “explicit outbound” methods. If a subnet had both, the <strong>NAT Gateway would take precedence</strong>.</p>
+</blockquote>
+<h3 id="tags-review-create-create">Tags → Review + create → Create</h3>
+<p>When it’s deployed, open <strong>pip-lb-az104-project06</strong> and <strong>note its IP address</strong> – this is your website’s address.</p>
+<hr />
+<h1 id="part-d-virtual-machines-30-min">Part D – Virtual machines (≈ 30 min) 💰</h1>
+<h2 id="step-5-copy-the-cloud-init-file">Step 5: Copy the cloud-init file</h2>
+<p>Open <code>scripts/cloud-init-web.yaml</code> in VS Code → <strong>Ctrl + A</strong> → <strong>Ctrl + C</strong>. The first line must be <code>#cloud-config</code>.</p>
+<p>It installs Nginx at first boot and publishes a page showing <strong>which server</strong> and <strong>which zone</strong> answered.</p>
+<h2 id="step-6-vm-lb1-zone-1">Step 6: vm-lb1 (Zone 1)</h2>
+<p>Search <strong>Virtual machines</strong> → <strong>+ Create → Azure virtual machine</strong>.</p>
+<h3 id="basics-1">Basics</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Resource group</td>
+<td><code>rg-az104-project06</code></td>
+</tr>
+<tr class="even">
+<td>Virtual machine name</td>
+<td><strong><code>vm-lb1</code></strong></td>
+</tr>
+<tr class="odd">
+<td>Region</td>
+<td><strong>(US) East US 2</strong></td>
+</tr>
+<tr class="even">
+<td>Availability options</td>
+<td><strong>Availability zone</strong></td>
+</tr>
+<tr class="odd">
+<td>Availability zone</td>
+<td><strong>Zone 1 only</strong> (untick any others)</td>
+</tr>
+<tr class="even">
+<td>Security type</td>
+<td>Trusted launch virtual machines</td>
+</tr>
+<tr class="odd">
+<td>Image</td>
+<td><strong>Ubuntu Server 24.04 LTS – x64 Gen2</strong></td>
+</tr>
+<tr class="even">
+<td>Size</td>
+<td><strong>Standard_D2als_v6</strong> – search <code>D2als</code> in <em>See all sizes</em> and <strong>don’t change the vCPU options</strong></td>
+</tr>
+<tr class="odd">
+<td>Authentication type</td>
+<td>SSH public key</td>
+</tr>
+<tr class="even">
+<td>Username</td>
+<td><code>azureuser</code></td>
+</tr>
+<tr class="odd">
+<td>SSH public key source</td>
+<td><strong>Generate new key pair</strong>, name <code>az104-p06-key</code></td>
+</tr>
+<tr class="even">
+<td>Public inbound ports</td>
+<td><strong>None</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="disks">Disks</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>OS disk type</td>
+<td><strong>Standard HDD (locally-redundant storage)</strong></td>
+</tr>
+<tr class="even">
+<td>Delete with VM</td>
+<td>✅</td>
+</tr>
+<tr class="odd">
+<td>Key management</td>
+<td>Platform-managed key</td>
+</tr>
+<tr class="even">
+<td>Data disks</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Disk controller:</strong> v6 sizes use the newer <strong>NVMe</strong> disk controller. If the portal shows <strong>Disk controller type</strong> (Disks or Advanced tab), choose <strong>NVMe</strong> – Ubuntu 24.04 supports it. These sizes also have <strong>no temporary disk</strong> (there’s no <code>d</code> in the name).</p>
+</blockquote>
+<h3 id="networking">Networking</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Virtual network</td>
+<td><code>vnet-az104-project06</code></td>
+</tr>
+<tr class="even">
+<td>Subnet</td>
+<td><strong>snet-web (10.10.1.0/24)</strong></td>
+</tr>
+<tr class="odd">
+<td>Public IP</td>
+<td><strong>None</strong></td>
+</tr>
+<tr class="even">
+<td>NIC network security group</td>
+<td><strong>None</strong> (the subnet NSG protects it)</td>
+</tr>
+<tr class="odd">
+<td>Delete NIC when VM is deleted</td>
+<td>✅</td>
+</tr>
+<tr class="even">
+<td><strong>Load balancing options</strong></td>
+<td><strong>Azure load balancer</strong></td>
+</tr>
+<tr class="odd">
+<td>Select a load balancer</td>
+<td><strong><code>lb-az104-project06</code></strong></td>
+</tr>
+<tr class="even">
+<td>Select a backend pool</td>
+<td><strong><code>bepool-web</code></strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Joining the backend pool <strong>at creation</strong> matters: the outbound rule only gives internet access to pool members, and cloud-init needs it at first boot to download Nginx.</p>
+</blockquote>
+<h3 id="management">Management</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Enable auto-shutdown</td>
+<td>✅</td>
+</tr>
+<tr class="even">
+<td>Shutdown time</td>
+<td>7:00:00 PM</td>
+</tr>
+<tr class="odd">
+<td>Time zone</td>
+<td>(UTC+01:00) / Central European</td>
+</tr>
+<tr class="even">
+<td>Notification</td>
+<td>Off</td>
+</tr>
+</tbody>
+</table>
+<h3 id="monitoring">Monitoring</h3>
+<p>Boot diagnostics: <strong>Enable with managed storage account (recommended)</strong>.</p>
+<h3 id="advanced">Advanced</h3>
+<p><strong>Custom data:</strong> paste the whole <code>cloud-init-web.yaml</code>. Check it starts with <code>#cloud-config</code>.</p>
+<h3 id="tags-review-create-create-1">Tags → Review + create → Create</h3>
+<p><strong>Download private key and create resource.</strong> Save <code>az104-p06-key.pem</code> in your <strong>Downloads</strong> folder (not in the repo) – the optional NAT rule demo uses it.</p>
+<h2 id="step-7-vm-lb2-zone-3">Step 7: vm-lb2 (Zone 3)</h2>
+<p>Exactly the same as Step 6, <strong>except</strong>:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Virtual machine name</td>
+<td><strong><code>vm-lb2</code></strong></td>
+</tr>
+<tr class="even">
+<td>Availability zone</td>
+<td><strong>Zone 3 only</strong></td>
+</tr>
+<tr class="odd">
+<td>SSH public key source</td>
+<td><strong>Use existing key stored in Azure</strong> → <code>az104-p06-key</code></td>
+</tr>
+</tbody>
+</table>
+<p>Everything else – size, image, subnet, <strong>no public IP</strong>, <strong>load balancer <code>lb-az104-project06</code> / backend pool <code>bepool-web</code></strong>, auto-shutdown, boot diagnostics, <strong>custom data</strong>, tags – is the same.</p>
+<h3 id="if-a-vm-fails-with-skunotavailable-not-available-in-zone">If a VM fails with <code>SkuNotAvailable</code> / “not available in zone”</h3>
+<p>That zone has no capacity. Recreate the VM in the remaining zone (e.g. <strong>Zone 3</strong>). If no zone works, choose <strong>Availability set</strong> instead (create a new set <code>avset-web</code>) and put both VMs in it – note it in your README.</p>
+<h2 id="step-8-check-the-vms-and-the-pool">Step 8: Check the VMs and the pool</h2>
+<ol type="1">
+<li><p><strong>Load balancers</strong> → <code>lb-az104-project06</code> → <strong>Settings → Backend pools</strong> → <code>bepool-web</code> shows <strong>vm-lb1</strong> and <strong>vm-lb2</strong>.</p></li>
+<li><p>Open each VM’s <strong>Overview</strong>: note the <strong>private IP</strong> (likely 10.10.1.4 and 10.10.1.5) and <strong>Availability zone</strong> (1 and 3).</p></li>
+<li><p><strong>Wait 3–5 minutes</strong> for cloud-init, then check Nginx on each VM: VM → <strong>Operations → Run command → RunShellScript</strong>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="ex">cloud-init</span> status<span class="kw">;</span> <span class="ex">systemctl</span> is-active nginx<span class="kw">;</span> <span class="ex">curl</span> -s http://localhost <span class="kw">|</span> <span class="fu">grep</span> <span class="st">&quot;Served by&quot;</span></span></code></pre></div>
+<p><strong>Expected:</strong> <code>status: done</code>, <code>active</code>, and <code>Served by: vm-lb1</code> (or vm-lb2).</p>
+<p>If Nginx isn’t installed, run this to install it (uses the outbound rule):</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="ex">apt-get</span> update -q <span class="kw">&amp;&amp;</span> <span class="ex">apt-get</span> install -y -q nginx <span class="kw">&amp;&amp;</span> <span class="bu">echo</span> <span class="st">&quot;&lt;h1&gt;Served by: </span><span class="va">$(</span><span class="fu">hostname</span><span class="va">)</span><span class="st">&lt;/h1&gt;&quot;</span> <span class="op">&gt;</span> /var/www/html/index.html <span class="kw">&amp;&amp;</span> <span class="ex">systemctl</span> enable --now nginx <span class="kw">&amp;&amp;</span> <span class="bu">echo</span> OK</span></code></pre></div></li>
+</ol>
+<hr />
+<h1 id="part-e-core-tests-30-min">Part E – Core tests (≈ 30 min) 💰</h1>
+<p>Use <code>&lt;LB-IP&gt;</code> = the public IP of <code>pip-lb-az104-project06</code>.</p>
+<h2 id="test-1-secure-by-default-website-blocked">Test 1: Secure by default (website BLOCKED)</h2>
+<ol type="1">
+<li>In your browser, open <strong><code>http://&lt;LB-IP&gt;</code></strong> (http, not https).</li>
+<li><strong>Expected:</strong> the page <strong>doesn’t load</strong> (spins, then times out).</li>
+</ol>
+<p>Why: the Standard Load Balancer forwards the traffic, but <code>nsg-web</code> has <strong>no rule allowing port 80 from the Internet</strong>, so the default <strong>DenyAllInBound</strong> drops it.</p>
+<p>📸 Screenshot the browser timing out, with the address bar visible.</p>
+<h2 id="test-2-allow-http-website-works">Test 2: Allow HTTP – website WORKS</h2>
+<ol type="1">
+<li><code>nsg-web</code> → <strong>Inbound security rules → + Add</strong>:</li>
+</ol>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Priority</th>
+<th>Name</th>
+<th>Source</th>
+<th>Source value</th>
+<th>Destination</th>
+<th>Dest. value</th>
+<th>Port</th>
+<th>Protocol</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>100</td>
+<td>Allow-HTTP-Internet</td>
+<td>Service Tag</td>
+<td>Internet</td>
+<td>IP Addresses</td>
+<td>10.10.1.0/24</td>
+<td>80</td>
+<td>TCP</td>
+<td>Allow</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="1">
+<li>Wait 30 seconds and refresh <strong><code>http://&lt;LB-IP&gt;</code></strong>.</li>
+<li><strong>Expected:</strong> the page shows <strong>“Served by: vm-lb1”</strong> (or vm-lb2) and its <strong>availability zone</strong>.</li>
+</ol>
+<p>📸 Screenshot the page.</p>
+<blockquote>
+<p>The NSG rule’s <strong>destination is the VM subnet</strong>, not the load balancer’s IP – the load balancer passes traffic through to the VMs, and the NSG on the VMs’ subnet makes the decision. The <strong>source</strong> stays the visitor’s real IP, which is why <code>Internet</code> matches.</p>
+</blockquote>
+<h2 id="test-3-distribution-across-both-servers">Test 3: Distribution across both servers</h2>
+<p>Browsers reuse connections, so use your <strong>Ubuntu terminal</strong> (replace <code>&lt;LB-IP&gt;</code>):</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">for</span> <span class="ex">i</span> in <span class="va">$(</span><span class="fu">seq</span> 1 10<span class="va">)</span><span class="kw">;</span> <span class="kw">do</span> <span class="ex">curl</span> -s http://<span class="op">&lt;</span>LB-IP<span class="op">&gt;</span> <span class="kw">|</span> <span class="fu">grep</span> -o <span class="st">&quot;vm-lb[12]&quot;</span><span class="kw">;</span> <span class="kw">done</span></span></code></pre></div>
+<p><code>for i in $(seq 1 10)</code> repeats 10 times; <code>curl -s</code> fetches the page; <code>grep -o "vm-lb[12]"</code> shows only the server name.</p>
+<p><strong>Expected:</strong> a mix of <strong>vm-lb1</strong> and <strong>vm-lb2</strong>. Each <code>curl</code> is a new connection with a new source port, so the <strong>5-tuple hash</strong> spreads them.</p>
+<p>📸 Screenshot the terminal output.</p>
+<h2 id="test-4-health-check-and-failover">Test 4: Health check and failover</h2>
+<ol type="1">
+<li><p>Open <strong>vm-lb1</strong> → <strong>Run command → RunShellScript</strong>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="ex">systemctl</span> stop nginx <span class="kw">&amp;&amp;</span> <span class="bu">echo</span> <span class="st">&quot;nginx stopped on </span><span class="va">$(</span><span class="fu">hostname</span><span class="va">)</span><span class="st">&quot;</span></span></code></pre></div></li>
+<li><p>Wait <strong>about 30 seconds</strong> (the probe checks every 5 seconds).</p></li>
+<li><p>Run the curl loop again from Test 3.</p></li>
+<li><p><strong>Expected:</strong> <strong>only vm-lb2</strong> answers. The website stayed up even though a server failed.</p></li>
+<li><p>See the probe’s view: <code>lb-az104-project06</code> → <strong>Monitoring → Metrics</strong> → Metric <strong>Health Probe Status</strong> → <strong>Apply splitting</strong> by <strong>Backend IP Address</strong>. vm-lb1’s line drops to 0 (unhealthy); vm-lb2 stays at 100.</p></li>
+</ol>
+<p>📸 Screenshot the curl output (only vm-lb2) and the Health Probe Status chart.</p>
+<h2 id="test-5-recovery">Test 5: Recovery</h2>
+<ol type="1">
+<li><p>On <strong>vm-lb1</strong> → Run command:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="ex">systemctl</span> start nginx <span class="kw">&amp;&amp;</span> <span class="bu">echo</span> <span class="st">&quot;nginx started on </span><span class="va">$(</span><span class="fu">hostname</span><span class="va">)</span><span class="st">&quot;</span></span></code></pre></div></li>
+<li><p>Wait 30 seconds, run the curl loop again.</p></li>
+<li><p><strong>Expected:</strong> both servers answer again – vm-lb1 rejoined automatically.</p></li>
+</ol>
+<hr />
+<h1 id="part-f-session-persistence-10-min">Part F – Session persistence (≈ 10 min) 💰</h1>
+<h2 id="test-6-client-ip-persistence">Test 6: Client IP persistence</h2>
+<ol type="1">
+<li><code>lb-az104-project06</code> → <strong>Settings → Load balancing rules</strong> → <code>rule-http</code>.</li>
+<li><strong>Session persistence</strong> → <strong>Client IP</strong> → <strong>Save</strong>. Wait about a minute.</li>
+<li>Run the curl loop.</li>
+<li><strong>Expected:</strong> <strong>all 10 answers come from the same server</strong> – the load balancer now hashes on your IP only.</li>
+<li><strong>Set it back to None</strong> and save.</li>
+</ol>
+<p>📸 Screenshot the curl output.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Session persistence</th>
+<th>Hash</th>
+<th>Same visitor → same server?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>None</strong> (default)</td>
+<td>5-tuple (src IP, src port, dst IP, dst port, protocol)</td>
+<td>Not guaranteed</td>
+</tr>
+<tr class="even">
+<td><strong>Client IP</strong></td>
+<td>2-tuple (src IP, dst IP)</td>
+<td>Yes</td>
+</tr>
+<tr class="odd">
+<td><strong>Client IP and protocol</strong></td>
+<td>3-tuple (+ protocol)</td>
+<td>Yes, per protocol</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1 id="part-g-optional-inbound-nat-rule-done-safely-15-min">Part G – OPTIONAL: Inbound NAT rule, done safely (≈ 15 min) 💰</h1>
+<p>This opens SSH to <strong>one VM, from your IP only, temporarily</strong>.</p>
+<h2 id="step-9-create-the-nat-rule">Step 9: Create the NAT rule</h2>
+<ol type="1">
+<li><code>lb-az104-project06</code> → <strong>Settings → Inbound NAT rules → + Add</strong>:</li>
+</ol>
+<table>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Name</td>
+<td><code>nat-ssh-vm-lb1</code></td>
+</tr>
+<tr class="even">
+<td>Type</td>
+<td><strong>Azure virtual machine</strong></td>
+</tr>
+<tr class="odd">
+<td>Target virtual machine</td>
+<td><strong>vm-lb1</strong></td>
+</tr>
+<tr class="even">
+<td>Network IP configuration</td>
+<td>ipconfig1</td>
+</tr>
+<tr class="odd">
+<td>Frontend IP address</td>
+<td><code>fe-web</code></td>
+</tr>
+<tr class="even">
+<td>Frontend port</td>
+<td><strong>50001</strong></td>
+</tr>
+<tr class="odd">
+<td>Service tag</td>
+<td>Custom</td>
+</tr>
+<tr class="even">
+<td>Backend port</td>
+<td><strong>22</strong></td>
+</tr>
+<tr class="odd">
+<td>Protocol</td>
+<td>TCP</td>
+</tr>
+<tr class="even">
+<td>Enable TCP Reset</td>
+<td>✅</td>
+</tr>
+<tr class="odd">
+<td>Idle timeout</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<ol start="2" type="1">
+<li><strong>Add</strong>.</li>
+</ol>
+<h2 id="step-10-allow-ssh-from-your-ip-only">Step 10: Allow SSH from YOUR IP only</h2>
+<p><code>nsg-web</code> → <strong>Inbound security rules → + Add</strong>:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Priority</th>
+<th>Name</th>
+<th>Source</th>
+<th>Destination</th>
+<th>Port</th>
+<th>Protocol</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>120</td>
+<td>Allow-SSH-MyIP-TEMP</td>
+<td><strong>My IP address</strong></td>
+<td>IP Addresses → 10.10.1.0/24</td>
+<td>22</td>
+<td>TCP</td>
+<td>Allow</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>The NSG checks the <strong>backend</strong> port (22), not the frontend port (50001) – the load balancer translates the port before the traffic reaches the subnet.</p>
+</blockquote>
+<h2 id="step-11-connect">Step 11: Connect</h2>
+<p>In your Ubuntu terminal:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="fu">chmod</span> 400 ~/Downloads/az104-p06-key.pem</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="fu">ssh</span> -i ~/Downloads/az104-p06-key.pem -p 50001 azureuser@<span class="op">&lt;</span>LB-IP<span class="op">&gt;</span></span></code></pre></div>
+<ul>
+<li><code>chmod 400</code> makes the key readable only by you (SSH refuses keys that others can read).</li>
+<li><code>-p 50001</code> connects to the load balancer’s port 50001, which forwards to <strong>vm-lb1:22</strong>.</li>
+</ul>
+<p>Type <code>yes</code> to the fingerprint question. You’re now on vm-lb1. Run <code>hostname</code> (shows <code>vm-lb1</code>), then <code>exit</code>.</p>
+<p>📸 Screenshot the SSH session showing <code>hostname</code>.</p>
+<h2 id="step-12-remove-it-straight-away">Step 12: Remove it straight away</h2>
+<ol type="1">
+<li><code>lb-az104-project06</code> → <strong>Inbound NAT rules</strong> → delete <strong>nat-ssh-vm-lb1</strong>.</li>
+<li><code>nsg-web</code> → <strong>Inbound security rules</strong> → delete <strong>Allow-SSH-MyIP-TEMP</strong>.</li>
+</ol>
+<blockquote>
+<p><strong>Security+ point:</strong> least privilege (one VM, one port, one source IP), minimal exposure time, and removal afterwards. In production, <strong>Azure Bastion</strong> (Project 07) avoids opening management ports at all.</p>
+</blockquote>
+<hr />
+<h1 id="part-h-clean-up-10-min-charging-stops">Part H – Clean up (≈ 10 min) – 💰 charging stops</h1>
+<ol type="1">
+<li><p><strong>Resource groups</strong> → <code>rg-az104-project06</code> → check the list (2 VMs, disks, NICs, NSG, VNet, load balancer, public IP).</p></li>
+<li><p><strong>Delete resource group</strong> → tick <strong>Apply force delete for selected Virtual machines</strong> → type <code>rg-az104-project06</code> → <strong>Delete</strong>.</p></li>
+<li><p>Watch the <strong>bell icon</strong> (5–10 minutes).</p></li>
+<li><p>Confirm in the terminal:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="ex">az</span> group exists --name rg-az104-project06   # expect: false</span></code></pre></div></li>
+<li><p>Delete <code>~/Downloads/az104-p06-key.pem</code> – its VMs are gone.</p></li>
+</ol>
+<p>📸 Screenshot the <code>false</code>.</p>
+<hr />
+<h1 id="screenshot-checklist-screenshotsgui">Screenshot checklist (<code>screenshots/gui/</code>)</h1>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>File name</th>
+<th>Where</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>00</td>
+<td><code>00 Resource Group Created.png</code></td>
+<td>rg-az104-project06 with tags</td>
+</tr>
+<tr class="even">
+<td>01</td>
+<td><code>01 NSG Web Inbound Rules (No HTTP).png</code></td>
+<td>nsg-web before the HTTP rule</td>
+</tr>
+<tr class="odd">
+<td>02</td>
+<td><code>02 VNet + Subnets.png</code></td>
+<td>VNet → Subnets, snet-web with nsg-web</td>
+</tr>
+<tr class="even">
+<td>03</td>
+<td><code>03 Load Balancer Frontend IP.png</code></td>
+<td>LB → Frontend IP configuration (zone-redundant public IP)</td>
+</tr>
+<tr class="odd">
+<td>04</td>
+<td><code>04 Backend Pool.png</code></td>
+<td>LB → Backend pools: vm-lb1 and vm-lb2</td>
+</tr>
+<tr class="even">
+<td>05</td>
+<td><code>05 Health Probe.png</code></td>
+<td>LB → Health probes: probe-http (HTTP 80 /)</td>
+</tr>
+<tr class="odd">
+<td>06</td>
+<td><code>06 Load Balancing Rule.png</code></td>
+<td>LB → Load balancing rules: rule-http</td>
+</tr>
+<tr class="even">
+<td>07</td>
+<td><code>07 Outbound Rule.png</code></td>
+<td>LB → Outbound rules: rule-outbound</td>
+</tr>
+<tr class="odd">
+<td>08</td>
+<td><code>08 VM LB1 Zone 1.png</code></td>
+<td>vm-lb1 Overview: Zone 1, D2als_v6, no public IP</td>
+</tr>
+<tr class="even">
+<td>09</td>
+<td><code>09 VM LB2 Zone 3.png</code></td>
+<td>vm-lb2 Overview: Zone 3, no public IP</td>
+</tr>
+<tr class="odd">
+<td>10</td>
+<td><code>10 Nginx Check Run Command.png</code></td>
+<td>Run command: cloud-init done, nginx active</td>
+</tr>
+<tr class="even">
+<td>11</td>
+<td><code>11 Secure By Default Blocked.png</code></td>
+<td>Browser timing out (Test 1)</td>
+</tr>
+<tr class="odd">
+<td>12</td>
+<td><code>12 NSG Allow HTTP Rule.png</code></td>
+<td>nsg-web with Allow-HTTP-Internet</td>
+</tr>
+<tr class="even">
+<td>13</td>
+<td><code>13 Website Working.png</code></td>
+<td>Browser showing “Served by” + zone (Test 2)</td>
+</tr>
+<tr class="odd">
+<td>14</td>
+<td><code>14 Distribution Test.png</code></td>
+<td>curl loop: both vm-lb1 and vm-lb2</td>
+</tr>
+<tr class="even">
+<td>15</td>
+<td><code>15 Failover Test.png</code></td>
+<td>curl loop: only vm-lb2 after stopping nginx</td>
+</tr>
+<tr class="odd">
+<td>16</td>
+<td><code>16 Health Probe Status.png</code></td>
+<td>Metrics chart: vm-lb1 unhealthy</td>
+</tr>
+<tr class="even">
+<td>17</td>
+<td><code>17 Recovery Test.png</code></td>
+<td>curl loop: both servers again</td>
+</tr>
+<tr class="odd">
+<td>18</td>
+<td><code>18 Session Persistence Client IP.png</code></td>
+<td>curl loop: one server only</td>
+</tr>
+<tr class="even">
+<td>19</td>
+<td><code>19 Inbound NAT Rule.png</code></td>
+<td>(optional) nat-ssh-vm-lb1</td>
+</tr>
+<tr class="odd">
+<td>20</td>
+<td><code>20 SSH Via NAT Rule.png</code></td>
+<td>(optional) SSH session showing hostname</td>
+</tr>
+<tr class="even">
+<td>21</td>
+<td><code>21 Resource Group Clean Up.png</code></td>
+<td>Deletion / <code>az group exists</code> → false</td>
+</tr>
+</tbody>
+</table>
+<p>Blur subscription IDs, tenant IDs and email addresses. Your <strong>public IP address</strong> (used in “My IP address”) is also worth blurring.</p>
+<hr />
+<h1 id="what-the-portal-taught-you">What the portal taught you</h1>
+<ul>
+<li>A <strong>Standard</strong> load balancer is closed until an <strong>NSG</strong> allows the traffic.</li>
+<li>The load balancer is <strong>Layer 4</strong>: it sees IPs and ports, not URLs.</li>
+<li><strong>Health probes</strong> decide which backends get traffic – and come from <code>AzureLoadBalancer</code> (168.63.129.16).</li>
+<li>VMs join a <strong>backend pool</strong> through their <strong>NIC</strong>.</li>
+<li><strong>Outbound rules</strong> give pool members explicit internet access without public IPs.</li>
+<li><strong>Inbound NAT rules</strong> map one frontend port to one VM’s port – useful, but risky if not restricted.</li>
+<li><strong>Zones</strong> spread the VMs across datacenters; a <strong>zone-redundant</strong> frontend survives a zone failure.</li>
+</ul>
+</body>
+</html>

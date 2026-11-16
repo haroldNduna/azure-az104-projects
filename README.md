@@ -25,21 +25,21 @@ Projects are numbered in the order they are built. From Project 04 onwards they 
 
 | # | Project | Difficulty | AZ-104 Domain | Security+ Domains | Status |
 |---|---------|------------|---------------|-------------------|--------|
-| 01 | [Resource Groups & Tags](./project-01-resource-groups-tags/) | ⭐ | Manage subscriptions & resources | 3.0, 5.0 | ✅ Complete |
-| 02 | [Azure Storage Account](./project-02-storage-account/) | ⭐⭐ | Manage storage | 2.0, 4.0, 5.0 | ✅ Complete |
-| 03 | [Virtual Network & Subnets](./project-03-virtual-network/) | ⭐⭐ | Manage networking | 2.0 | ✅ Complete |
-| 04 | [Network Security Groups](./project-04-nsg/) | ⭐⭐⭐ | Implement and manage virtual networking | 2.0, 3.0 | ✅ Complete |
-| 05 | [Virtual Machines, ASGs & Extensions](./project-05-vm-asg-extensions/) | ⭐⭐⭐ | Deploy and manage compute resources | 2.0, 4.0 | ✅ Complete |
-| 06 | [Standard Load Balancer with Two VMs](./project-06-load-balancer/) | ⭐⭐⭐⭐ | Implement and manage virtual networking | 3.0 | ⏳ Planned |
-| 07 | [Hub-Spoke Peering, Route Table & Bastion](./project-07-hub-spoke/) | ⭐⭐⭐⭐ | Implement and manage virtual networking | 2.0, 3.0 | ⏳ Planned |
-| 08 | [Azure DNS (Private & Public Zones)](./project-08-azure-dns/) | ⭐⭐⭐⭐ | Implement and manage virtual networking | 3.0, 4.0 | ⏳ Planned |
-| 09 | [Identity & Governance](./project-09-identity-governance/) | ⭐⭐⭐⭐⭐ | Manage Azure identities and governance | 4.0, 5.0 | ⏳ Planned |
-| 10 | [Scale Sets, App Service & Container Apps](./project-10-compute-services/) | ⭐⭐⭐⭐ | Deploy and manage compute resources | 3.0 | ⏳ Planned |
-| 11 | [Storage Security](./project-11-storage-security/) | ⭐⭐⭐ | Implement and manage storage | 1.0, 3.0, 4.0 | ⏳ Planned |
-| 12 | [VM Backup & Restore](./project-12-backup-restore/) | ⭐⭐⭐⭐ | Monitor and maintain Azure resources | 3.0, 4.0 | ⏳ Planned |
-| 13 | [Azure Monitor & Log Analytics](./project-13-monitor/) | ⭐⭐⭐⭐⭐ | Monitor and maintain Azure resources | 4.0 | ⏳ Planned |
-| 14 | [Application Gateway with WAF](./project-14-app-gateway-waf/) *(optional)* | ⭐⭐⭐⭐⭐ | Implement and manage virtual networking | 3.0, 4.0 | ⏳ Planned |
-| 15 | [Capstone: Secure Web App on Hub-Spoke](./project-15-capstone/) | ⭐⭐⭐⭐⭐ | All domains | 2.0, 3.0, 4.0, 5.0 | ⏳ Planned |
+| 01 | [Resource Groups & Tags](./project%201%20-%20Resouce%20Groups%20and%20Tags/) | ⭐ | Manage subscriptions & resources | 3.0, 5.0 | ✅ Complete |
+| 02 | [Azure Storage Account](./project%202%20-%20Storage%20Account/) | ⭐⭐ | Manage storage | 2.0, 4.0, 5.0 | ✅ Complete |
+| 03 | [Virtual Network & Subnets](./project%203%20-%20Virtual%20Network%20%28VNet%29%20with%20Subnets/) | ⭐⭐ | Manage networking | 2.0 | ✅ Complete |
+| 04 | [Network Security Groups](./project%204%20-%20Network%20Security%20Groups/) | ⭐⭐⭐ | Implement and manage virtual networking | 2.0, 3.0 | ✅ Complete |
+| 05 | [Virtual Machines, ASGs & Extensions](./project%205%20-%20Virtual%20Machines%2C%20ASGs%20%26%20Extensions/) | ⭐⭐⭐ | Deploy and manage compute resources | 2.0, 4.0 | ✅ Complete |
+| 06 | [Standard Load Balancer with Two VMs](./project%206%20-%20Standard%20Load%20Balancer%20with%20Two%20VMs/) | ⭐⭐⭐⭐ | Implement and manage virtual networking | 3.0 | ✅ Complete |
+| 07 | [Hub-Spoke Peering, Route Table & Bastion](./project%207%20-%20Hub-Spoke%20Peering%2C%20Route%20Table%20%26%20Bastion/) | ⭐⭐⭐⭐ | Implement and manage virtual networking | 2.0, 3.0 | ⏳ Planned |
+| 08 | [Azure DNS (Private & Public Zones)](./project%208%20-%20Azure%20DNS%20%28Private%20%26%20Public%20Zones%29/) | ⭐⭐⭐⭐ | Implement and manage virtual networking | 3.0, 4.0 | ⏳ Planned |
+| 09 | [Identity & Governance](./project%209%20-%20Identity%20%26%20Governance/) | ⭐⭐⭐⭐⭐ | Manage Azure identities and governance | 4.0, 5.0 | ⏳ Planned |
+| 10 | [Scale Sets, App Service & Container Apps](./project%2010%20-%20Scale%20Sets%2C%20App%20Service%20%26%20Container%20Apps/) | ⭐⭐⭐⭐ | Deploy and manage compute resources | 3.0 | ⏳ Planned |
+| 11 | [Storage Security](./project%2011%20-%20Storage%20Security/) | ⭐⭐⭐ | Implement and manage storage | 1.0, 3.0, 4.0 | ⏳ Planned |
+| 12 | [VM Backup & Restore](./project%2012%20-%20VM%20Backup%20%26%20Restore/) | ⭐⭐⭐⭐ | Monitor and maintain Azure resources | 3.0, 4.0 | ⏳ Planned |
+| 13 | [Azure Monitor & Log Analytics](./project%2013%20-%20Azure%20Monitor%20%26%20Log%20Analytics/) | ⭐⭐⭐⭐⭐ | Monitor and maintain Azure resources | 4.0 | ⏳ Planned |
+| 14 | [Application Gateway with WAF](./project%2014%20-%20Application%20Gateway%20with%20WAF/) *(optional)* | ⭐⭐⭐⭐⭐ | Implement and manage virtual networking | 3.0, 4.0 | ⏳ Planned |
+| 15 | [Capstone: Secure Web App on Hub-Spoke](./project%2015%20-%20Capstone%20Secure%20Web%20App%20on%20Hub-Spoke/) | ⭐⭐⭐⭐⭐ | All domains | 2.0, 3.0, 4.0, 5.0 | ⏳ Planned |
 
 ### What Each Project Covers (04 onwards)
 
@@ -87,7 +87,6 @@ Every project folder follows the same layout:
 | `parameters.json` | Deployment parameters |
 | `cleanup.sh` | Teardown script with typed confirmation |
 | `notes-tips-tricks.md` | AZ-104 exam notes and traps |
-| `portal-walkthrough.md` | Step-by-step Azure Portal build (from Project 04 onwards) |
 | `architecture-diagram.png` | Architecture diagram |
 | `screenshots/` | Portal and terminal evidence |
 

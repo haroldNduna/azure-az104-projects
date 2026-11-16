@@ -1,0 +1,19 @@
+#cloud-config
+# =============================================================================
+# Project 06 - cloud-init for vm-lb1 and vm-lb2
+# Paste the WHOLE file into the "Custom data" box when creating each VM
+# (Advanced tab). Runs ONCE, at first boot.
+#
+# Installs Nginx and publishes a page showing WHICH server and WHICH
+# availability zone answered - so you can see the load balancer at work.
+#
+# Needs outbound internet for apt: provided by the load balancer's
+# OUTBOUND RULE, so the VM must be in the backend pool when it is created.
+# Plain ASCII only (the Azure CLI rejects some special characters).
+# =============================================================================
+package_update: true
+packages:
+  - nginx
+runcmd:
+  - [ sh, -c, 'ZONE=$(curl -s -H Metadata:true "http://169.254.169.254/metadata/instance/compute/zone?api-version=2021-02-01&format=text"); IP=$(hostname -I); IP=${IP%% *}; printf "<!DOCTYPE html>\n<html><head><title>AZ-104 Project 06</title></head>\n<body style=\"font-family: sans-serif; margin: 40px;\">\n<h1>Served by: %s</h1>\n<p>Availability zone: %s</p>\n<p>Private IP: %s</p>\n<p>Behind a Standard Load Balancer - refresh to see the other server.</p>\n</body></html>\n" "$(hostname)" "${ZONE:-none}" "$IP" > /var/www/html/index.html' ]
+  - systemctl enable --now nginx
