@@ -40,7 +40,7 @@ It also shows that the **Standard Load Balancer is secure by default**: the webs
 
 ## Architecture
 
-![Architecture diagram](architecture-diagram.png)
+![Architecture diagram](project 6 architecture diagram.jpg)
 
 | Component | Name | Details |
 |---|---|---|
